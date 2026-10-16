@@ -77,6 +77,22 @@ The seed creates an admin only when none exists, using `ADMIN_EMAIL` (default `a
 
 ---
 
+## Running in production
+
+PM2 keeps the site running on port 3000, and nginx forwards port 80 to it. The process is defined in `ecosystem.config.js`.
+
+To ship a new version:
+
+```bash
+git pull
+npm ci
+npx prisma generate
+npm run build
+pm2 reload personal-website
+```
+
+`pm2 logs personal-website` shows the server log; `pm2 ls` shows its status.
+
 ## 🚀 Useful Commands
 
 ```bash

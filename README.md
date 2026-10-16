@@ -79,19 +79,41 @@ The seed creates an admin only when none exists, using `ADMIN_EMAIL` (default `a
 
 ## Running in production
 
-PM2 keeps the site running on port 3000, and nginx forwards port 80 to it. The process is defined in `ecosystem.config.js`.
+The live site always runs GitHub's `master` branch. Every 5 minutes cron runs
+`~/apps/albertdammara.com/bin/deploy.sh`, which does nothing unless `master` has a
+new commit. When it has, the script builds that commit into a new release folder,
+copies the database to `shared/backups/`, applies schema changes that keep all data,
+switches the `current` symlink and reloads PM2. A failed build or a new version that
+does not answer leaves (or puts back) the previous release.
 
-To ship a new version:
-
-```bash
-git pull
-npm ci
-npx prisma generate
-npm run build
-pm2 reload personal-website
+```
+~/apps/albertdammara.com/
+  current -> releases/<time>-<commit>   what PM2 runs (port 3000, localhost only)
+  releases/                             the last 3 builds
+  shared/.env                           secrets; DATABASE_URL points into shared/data
+  shared/data/prod.db                   live database
+  shared/storage/                       Notion images, uploaded resumes
+  shared/backups/                       database copies from the last 10 deploys
+  shared/deploy.log                     what each deploy did
 ```
 
-`pm2 logs personal-website` shows the server log; `pm2 ls` shows its status.
+Useful commands on the server:
+
+```bash
+tail -n 30 ~/apps/albertdammara.com/shared/deploy.log   # recent deploys
+~/apps/albertdammara.com/bin/deploy.sh --force          # redeploy master now
+pm2 logs personal-website                               # live server log
+```
+
+### Development preview
+
+This checkout (`~/personal-website`, branch `development`) runs as
+`personal-website-dev` on port 3001 with its own `prisma/dev.db`. The firewall keeps
+3001 closed to the internet, so it is reachable over Tailscale only.
+
+```bash
+npm run build && pm2 startOrReload ecosystem.config.js
+```
 
 ## 🚀 Useful Commands
 

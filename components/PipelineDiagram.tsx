@@ -8,7 +8,7 @@ const getStages = (notionLive: boolean): Record<StageKey, Stage> => ({
   sync: { title: 'Sync job', detail: 'Every 15 minutes', planned: !notionLive },
   db: { title: 'Database', detail: 'Posts and projects' },
   site: { title: 'This website', detail: 'Pages built from the data' },
-  resume: { title: 'Resume', detail: 'The PDF I upload', planned: true },
+  resume: { title: 'Resume', detail: 'Roles, skills, education' },
   ask: { title: 'Ask bar', detail: 'Answers from these only', highlight: true },
 });
 
@@ -131,11 +131,13 @@ export function PipelineDiagram({ notionLive = false }: { notionLive?: boolean }
             <StackedCard stage={stages.site} />
             <StackedCard stage={stages.ask} />
           </div>
-          <p className="mt-3 text-[15px] text-muted">The ask bar also reads my resume (planned).</p>
+          <p className="mt-3 text-[15px] text-muted">The ask bar also reads my resume.</p>
         </div>
       </div>
 
-      <figcaption className="mt-5 text-sm text-muted">Dashed boxes are planned and not live yet.</figcaption>
+      {Object.values(stages).some((s) => s.planned) && (
+        <figcaption className="mt-5 text-sm text-muted">Dashed boxes are planned and not live yet.</figcaption>
+      )}
     </figure>
   );
 }

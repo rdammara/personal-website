@@ -92,7 +92,7 @@ export function AskBar() {
         </button>
       </form>
       <p className="mt-3 text-center text-sm text-muted">
-        Answers come only from what’s published on this website.
+        Answers come from this website and my resume, nothing else.
       </p>
 
       {messages.length > 0 && (

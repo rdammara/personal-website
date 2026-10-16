@@ -1,27 +1,19 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { site } from '@/lib/site';
+import { resume } from '@/lib/resume';
 import { PageHeader } from '@/components/PageHeader';
 
-export const metadata: Metadata = { title: 'Resume' };
+export const metadata: Metadata = { title: 'Resume', description: resume.summary };
 
-// Drawn only from what Albert wrote in the About text; dates and employers are
-// left out until the real resume is added.
-const experience = [
-  { role: 'Software Quality Engineer', note: 'Current role' },
-  { role: 'Industrial analytics', note: 'Machine sensor data for predictive maintenance and equipment reliability' },
-  {
-    role: 'Data engineering, industrial piping manufacturing',
-    note: 'Real-time pipelines for sensor data across production sites, connecting edge data to the central MES',
-  },
-];
+const sectionGrid = 'grid gap-6 border-t border-line pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] md:gap-14';
+const sectionTitle = 'm-0 text-[26px] font-bold tracking-[-0.02em]';
 
 export default function ResumePage() {
   return (
     <div className="mx-auto max-w-[1180px] px-5 pb-30 sm:px-10 max-sm:pb-18">
-      <PageHeader title="Resume">
-        <div className="mt-8 flex flex-wrap items-center gap-4">
-          {site.resumePdfUrl ? (
+      <PageHeader title="Resume" intro={resume.summary}>
+        {site.resumePdfUrl && (
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
               href={site.resumePdfUrl}
               download
@@ -29,36 +21,58 @@ export default function ResumePage() {
             >
               Download resume (PDF)
             </a>
-          ) : (
-            <p className="m-0 text-muted">The PDF version will be available here soon.</p>
-          )}
-        </div>
+          </div>
+        )}
       </PageHeader>
 
-      <section className="grid gap-6 border-t border-line pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] md:gap-14">
-        <h2 className="m-0 text-[26px] font-bold tracking-[-0.02em]">Experience</h2>
+      <section className={sectionGrid}>
+        <h2 className={sectionTitle}>Experience</h2>
         <ol className="m-0 list-none p-0">
-          {experience.map((item) => (
-            <li key={item.role} className="border-b border-line pb-6 pt-0 [&+li]:pt-6">
-              <p className="m-0 text-[19px] font-semibold">{item.role}</p>
-              <p className="mb-0 mt-1 text-muted">{item.note}</p>
+          {resume.experience.map((job) => (
+            <li key={job.organization} className="border-b border-line pb-8 [&+li]:pt-8">
+              <p className="m-0 text-[19px] font-bold">{job.organization}</p>
+              <p className="mb-0 mt-0.5 text-[15px] text-muted">{job.location}</p>
+              {job.roles.map((role) => (
+                <div key={role.title} className="mt-5">
+                  <p className="m-0 font-semibold">{role.title}</p>
+                  <p className="mb-0 mt-0.5 font-mono text-[13px] text-muted">{role.dates}</p>
+                  <p className="mb-0 mt-2 max-w-[42em]">{role.detail}</p>
+                </div>
+              ))}
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="mt-14 grid gap-6 border-t border-line pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] md:gap-14">
-        <h2 className="m-0 text-[26px] font-bold tracking-[-0.02em]">Education</h2>
-        <p className="m-0 text-[19px]">Information Systems, with a minor in Big Data Analytics</p>
+      <section className={`mt-14 ${sectionGrid}`}>
+        <h2 className={sectionTitle}>Skills</h2>
+        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+          {resume.skills.map((skill) => (
+            <li key={skill} className="rounded-lg border border-line px-3 py-1.5 text-[15px]">
+              {skill}
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <p className="mt-14 text-muted">
-        The longer story is in the{' '}
-        <Link href="/#about" className="font-semibold text-accent hover:underline">
-          About section
-        </Link>
-        .
-      </p>
+      <section className={`mt-14 ${sectionGrid}`}>
+        <h2 className={sectionTitle}>Education</h2>
+        <ol className="m-0 list-none p-0">
+          {resume.education.map((school) => (
+            <li key={school.name} className="border-b border-line pb-8 [&+li]:pt-8">
+              <p className="m-0 text-[19px] font-bold">{school.name}</p>
+              <p className="mb-0 mt-0.5 text-[15px] text-muted">{school.location}</p>
+              <p className="mb-0 mt-4 font-semibold">{school.degree}</p>
+              <p className="mb-0 mt-0.5 font-mono text-[13px] text-muted">{school.dates}</p>
+              <ul className="mb-0 mt-2 list-disc space-y-1 pl-5">
+                {school.notes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }

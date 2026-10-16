@@ -1,6 +1,7 @@
 import { prisma } from './prisma';
 import { site } from './site';
 import { markdownToText } from '@/components/Markdown';
+import { resumePassages } from './resume';
 
 export interface DocumentChunk {
   id: string;
@@ -109,6 +110,10 @@ export async function retrieveRagContext(query: string, limit: number = 3): Prom
         content: paragraph,
       });
     });
+
+    for (const passage of resumePassages()) {
+      candidateChunks.push({ ...passage, source: `Resume: ${passage.title} (/resume)` });
+    }
 
     // Chunk blog posts
     for (const post of posts) {

@@ -1,12 +1,19 @@
 import Link from 'next/link';
-import { Shield, Home, BookOpen, Briefcase, LogOut, Terminal } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { Shield, Home, BookOpen, Briefcase, LogOut, FileText } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { getSessionUser } from '@/lib/auth';
 
-export default function AdminLayout({
+// Every page in this group needs a signed-in admin; /admin/login sits outside it
+export const dynamic = 'force-dynamic';
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  if (!(await getSessionUser())) redirect('/admin/login');
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Sidebar for Desktop / Header for Mobile */}
@@ -47,6 +54,13 @@ export default function AdminLayout({
           >
             <Briefcase className="w-4 h-4 text-cyan-600" />
             Manage Projects
+          </Link>
+          <Link
+            href="/admin/resume"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors"
+          >
+            <FileText className="w-4 h-4 text-orange-600" />
+            Resume
           </Link>
         </nav>
 

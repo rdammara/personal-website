@@ -42,7 +42,9 @@ export async function POST(req: NextRequest) {
 
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // HTTPS-only when the visit is HTTPS (nginx passes X-Forwarded-Proto); a
+      // secure cookie sent over plain HTTP would be dropped and login would fail
+      secure: req.headers.get('x-forwarded-proto') === 'https' || req.nextUrl.protocol === 'https:',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days

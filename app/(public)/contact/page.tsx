@@ -35,6 +35,14 @@ export default function ContactPage() {
           </dd>
         </div>
         <div className="grid gap-1 border-b border-line py-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-6">
+          <dt className="font-semibold">LinkedIn</dt>
+          <dd className="m-0">
+            <a href={site.linkedinUrl} className="font-mono text-accent hover:underline">
+              {site.linkedinUrl.replace('https://', '')}
+            </a>
+          </dd>
+        </div>
+        <div className="grid gap-1 border-b border-line py-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-6">
           <dt className="font-semibold">Quick questions</dt>
           <dd className="m-0 text-muted">
             The{' '}

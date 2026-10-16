@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { prisma } from './prisma';
 
 export const COOKIE_NAME = 'auth_session';
@@ -55,4 +56,9 @@ export async function getSessionUser() {
     console.error('Error fetching session user:', error);
     return null;
   }
+}
+
+// For API routes that change data: answer 401 unless an admin is signed in
+export function unauthorized() {
+  return NextResponse.json({ error: 'Sign in required.' }, { status: 401 });
 }

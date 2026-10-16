@@ -1,6 +1,7 @@
 import { prisma } from './prisma';
 import { site } from './site';
 import { markdownToText } from '@/components/Markdown';
+import { getCurrentResume } from './resume-file';
 
 export interface DocumentChunk {
   id: string;
@@ -11,35 +12,27 @@ export interface DocumentChunk {
 }
 
 /**
- * Splits text into overlapping chunks for semantic retrieval.
+ * Splits text into chunks of whole sentences for retrieval.
  */
-export function chunkText(text: string, chunkSize: number = 300, overlap: number = 50): string[] {
-  if (!text || text.length <= chunkSize) {
-    return [text.trim()].filter(Boolean);
-  }
+export function chunkText(text: string, maxLength: number = 450): string[] {
+  // Split on sentence ends and bullets so every chunk starts at a sentence, never mid-word
+  const sentences = text
+    .replace(/\s*\n\s*/g, ' ')
+    .split(/(?<=[.!?])\s+|\s*•\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   const chunks: string[] = [];
-  let start = 0;
-
-  while (start < text.length) {
-    let end = start + chunkSize;
-    if (end < text.length) {
-      // Try to break at a sentence or newline boundary
-      const lastPeriod = text.lastIndexOf('.', end);
-      const lastNewline = text.lastIndexOf('\n', end);
-      const boundary = Math.max(lastPeriod, lastNewline);
-      if (boundary > start + chunkSize / 2) {
-        end = boundary + 1;
-      }
+  let current = '';
+  for (const sentence of sentences) {
+    if (current && current.length + 1 + sentence.length > maxLength) {
+      chunks.push(current);
+      current = sentence;
+    } else {
+      current = current ? `${current} ${sentence}` : sentence;
     }
-
-    const chunk = text.slice(start, end).trim();
-    if (chunk) {
-      chunks.push(chunk);
-    }
-    start += chunkSize - overlap;
   }
-
+  if (current) chunks.push(current);
   return chunks;
 }
 
@@ -109,6 +102,13 @@ export async function retrieveRagContext(query: string, limit: number = 3): Prom
         content: paragraph,
       });
     });
+
+    const resume = await getCurrentResume();
+    if (resume) {
+      chunkText(resume.text).forEach((chunk, index) => {
+        candidateChunks.push({ id: `resume-${index}`, source: 'Resume (/resume)', title: 'Resume', content: chunk });
+      });
+    }
 
     // Chunk blog posts
     for (const post of posts) {

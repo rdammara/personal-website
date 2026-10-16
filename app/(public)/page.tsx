@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { site } from '@/lib/site';
 import { formatDate, timeAgo, excerpt } from '@/lib/utils';
 import { getPublishedPosts, getLastNotionSync, postDate, postSummary } from '@/lib/posts';
+import { getCurrentResume } from '@/lib/resume-file';
 import { AskBar } from '@/components/AskBar';
 import { PipelineDiagram } from '@/components/PipelineDiagram';
 
@@ -17,10 +18,11 @@ function isGitHub(url: string) {
 }
 
 export default async function HomePage() {
-  const [posts, projects, lastSync] = await Promise.all([
+  const [posts, projects, lastSync, resume] = await Promise.all([
     getPublishedPosts(3),
     prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 4 }),
     getLastNotionSync(),
+    getCurrentResume(),
   ]);
   const syncedAt = lastSync?.finishedAt ?? null;
   const [featured, ...moreProjects] = projects;
@@ -159,12 +161,19 @@ export default async function HomePage() {
           <div id="resume" className="scroll-mt-16 rounded-[20px] bg-surface p-10 max-sm:p-7">
             <h2 className="m-0 text-[30px] font-bold tracking-[-0.02em]">Resume</h2>
             <p className="mt-3.5 text-muted">My experience, education and the tools I use.</p>
-            <Link
-              href="/resume"
-              className="mt-7 inline-flex min-h-12 items-center rounded-full bg-fill px-6 font-semibold text-onfill no-underline"
-            >
-              View my resume
-            </Link>
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+              {resume && (
+                <a
+                  href="/download/resume"
+                  className="inline-flex min-h-12 items-center rounded-full bg-fill px-6 font-semibold text-onfill no-underline"
+                >
+                  Download resume (PDF)
+                </a>
+              )}
+              <Link href="/resume" className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">
+                Read it on the site
+              </Link>
+            </div>
           </div>
           <div id="contact" className="scroll-mt-16 rounded-[20px] bg-surface p-10 max-sm:p-7">
             <h2 className="m-0 text-[30px] font-bold leading-[1.15] tracking-[-0.02em]">

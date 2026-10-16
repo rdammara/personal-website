@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getSessionUser, unauthorized } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -13,6 +14,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await getSessionUser())) return unauthorized();
+
   try {
     const body = await req.json();
     const { title, description, downloadUrl, externalUrl } = body;

@@ -6,7 +6,7 @@ export const site = {
   domain: 'albertdammara.com',
   title: 'Data engineer for industrial and IoT data, with quality assurance discipline.',
   githubUrl: 'https://github.com/rdammara',
-  contactEmail: null as string | null,
+  contactEmail: 'albertdammara@gmail.com' as string | null,
   resumePdfUrl: null as string | null,
   about: [
     'I’m a data engineer with a background in Information Systems and a minor in Big Data Analytics. My most hands-on work was in industrial manufacturing at an industrial piping manufacturing company, where I designed and deployed real-time pipelines to ingest and visualize sensor data across production sites, and worked with technical and business stakeholders to connect edge data to the central MES. I then moved into industrial analytics, using machine sensor data to support predictive maintenance and equipment reliability decisions.',

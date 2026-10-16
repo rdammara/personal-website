@@ -13,5 +13,15 @@ module.exports = {
       max_memory_restart: '512M',
       time: true,
     },
+    {
+      // Runs once, exits, and PM2 starts it again every 15 minutes
+      name: 'notion-sync',
+      cwd: __dirname,
+      script: 'scripts/sync-notion.mjs',
+      node_args: '--env-file=.env',
+      cron_restart: '*/15 * * * *',
+      autorestart: false,
+      time: true,
+    },
   ],
 };

@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
 import { site } from './site';
+import { markdownToText } from '@/components/Markdown';
 
 export interface DocumentChunk {
   id: string;
@@ -111,7 +112,7 @@ export async function retrieveRagContext(query: string, limit: number = 3): Prom
 
     // Chunk blog posts
     for (const post of posts) {
-      const chunks = chunkText(post.content);
+      const chunks = chunkText(markdownToText(post.content));
       chunks.forEach((chunk, index) => {
         candidateChunks.push({
           id: `blog-${post.id}-${index}`,

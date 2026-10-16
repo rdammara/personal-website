@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { formatDate, excerpt } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
+import { postDate, postSummary } from '@/lib/posts';
+import { Markdown } from '@/components/Markdown';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -18,12 +20,15 @@ async function getPost(slug: string) {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const post = await getPost((await params).slug);
-  return post ? { title: post.title, description: excerpt(post.content, 155) } : {};
+  return post ? { title: post.title, description: postSummary(post, 155) } : {};
 }
 
 export default async function BlogPostDetailPage({ params }: PageProps) {
   const post = await getPost((await params).slug);
   if (!post) notFound();
+
+  const date = postDate(post);
+  const edited = post.notionEditedAt ?? post.updatedAt;
 
   return (
     <article className="mx-auto max-w-[760px] px-5 pb-30 pt-16 sm:px-10 max-sm:pb-18 max-sm:pt-10">
@@ -37,17 +42,13 @@ export default async function BlogPostDetailPage({ params }: PageProps) {
         )}
         <h1 className="m-0 text-[clamp(32px,4.6vw,52px)] font-bold leading-[1.08] tracking-[-0.03em]">{post.title}</h1>
         <p className="mb-0 mt-5 font-mono text-[14px] text-muted">
-          {formatDate(post.createdAt)}
-          {post.updatedAt.getTime() - post.createdAt.getTime() > 60_000 && ` · updated ${formatDate(post.updatedAt)}`}
+          {formatDate(date)}
+          {edited.getTime() - date.getTime() > 24 * 3600 * 1000 && ` · updated ${formatDate(edited)}`}
         </p>
       </header>
 
-      <div className="mt-10 space-y-6 text-[19px] leading-relaxed">
-        {post.content.split('\n\n').map((paragraph, idx) => (
-          <p key={idx} className="m-0 whitespace-pre-line">
-            {paragraph}
-          </p>
-        ))}
+      <div className="mt-10">
+        <Markdown>{post.content}</Markdown>
       </div>
     </article>
   );

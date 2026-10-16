@@ -1,26 +1,18 @@
-// PM2 process definition. Start with `pm2 start ecosystem.config.js`,
-// then `pm2 save` so it comes back after a reboot.
+// PM2 process for the development preview: this checkout, on port 3001, with its
+// own database (prisma/dev.db). Reachable over Tailscale only, since the firewall
+// does not open 3001. The live site uses deploy/ecosystem.production.config.js.
+//   npm run build && pm2 startOrReload ecosystem.config.js
 module.exports = {
   apps: [
     {
-      name: 'personal-website',
+      name: 'personal-website-dev',
       cwd: __dirname,
       script: 'node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      args: 'start -p 3001',
       env: {
         NODE_ENV: 'production',
       },
       max_memory_restart: '512M',
-      time: true,
-    },
-    {
-      // Runs once, exits, and PM2 starts it again every 15 minutes
-      name: 'notion-sync',
-      cwd: __dirname,
-      script: 'scripts/sync-notion.mjs',
-      node_args: '--env-file=.env',
-      cron_restart: '*/15 * * * *',
-      autorestart: false,
       time: true,
     },
   ],

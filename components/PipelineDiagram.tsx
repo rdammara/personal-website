@@ -1,15 +1,24 @@
 // How content reaches this site. Stages marked `planned` are not built yet and
-// draw dashed, so the diagram stays true while the Notion sync is in progress.
+// draw dashed, so the diagram stays true while parts are still in progress.
 type Stage = { title: string; detail: string; planned?: boolean; highlight?: boolean };
+type StageKey = 'notion' | 'sync' | 'db' | 'site' | 'resume' | 'ask';
 
-const stages: Record<'notion' | 'sync' | 'db' | 'site' | 'resume' | 'ask', Stage> = {
-  notion: { title: 'Notion', detail: 'Where I write posts', planned: true },
-  sync: { title: 'Sync job', detail: 'Copies new and edited posts', planned: true },
+const getStages = (notionLive: boolean): Record<StageKey, Stage> => ({
+  notion: { title: 'Notion', detail: 'Where I write posts', planned: !notionLive },
+  sync: { title: 'Sync job', detail: 'Every 15 minutes', planned: !notionLive },
   db: { title: 'Database', detail: 'Posts and projects' },
   site: { title: 'This website', detail: 'Pages built from the data' },
   resume: { title: 'Resume', detail: 'The PDF I upload', planned: true },
   ask: { title: 'Ask bar', detail: 'Answers from these only', highlight: true },
-};
+});
+
+function describe(stages: Record<StageKey, Stage>) {
+  const planned = (Object.values(stages) as Stage[]).filter((s) => s.planned).map((s) => s.title);
+  return (
+    'Notion feeds a sync job, which loads the database. The database feeds this website and the ask bar. The resume also feeds the ask bar.' +
+    (planned.length ? ` Planned, not live yet: ${planned.join(', ')}.` : '')
+  );
+}
 
 // Card boxes on a 1040 x 312 canvas
 const W = 200;
@@ -83,7 +92,9 @@ function Down() {
   );
 }
 
-export function PipelineDiagram() {
+export function PipelineDiagram({ notionLive = false }: { notionLive?: boolean }) {
+  const stages = getStages(notionLive);
+  const description = describe(stages);
   return (
     <figure className="m-0">
       {/* Wide screens: the full diagram */}
@@ -93,10 +104,7 @@ export function PipelineDiagram() {
         aria-labelledby="pipeline-title"
         className="mx-auto hidden w-full max-w-[1040px] lg:block"
       >
-        <title id="pipeline-title">
-          Notion feeds a sync job, which loads the database. The database feeds this website and the ask bar. The resume
-          also feeds the ask bar. Notion, the sync job and the resume are planned.
-        </title>
+        <title id="pipeline-title">{description}</title>
         <defs>
           <marker id="pipeline-head" viewBox="0 0 8 8" refX="5" refY="4" markerWidth="8" markerHeight="8" orient="auto">
             <path d="M0 0 L8 4 L0 8 Z" className="fill-control" />
@@ -111,7 +119,7 @@ export function PipelineDiagram() {
       </svg>
 
       {/* Narrow screens: the same flow, stacked */}
-      <div className="lg:hidden" role="img" aria-label="Notion feeds a sync job, which loads the database. The database feeds this website and the ask bar. The resume also feeds the ask bar. Notion, the sync job and the resume are planned.">
+      <div className="lg:hidden" role="img" aria-label={description}>
         <div aria-hidden="true" className="mx-auto max-w-md">
           <StackedCard stage={stages.notion} />
           <Down />

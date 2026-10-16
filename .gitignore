@@ -11,3 +11,6 @@ prisma/*.db
 prisma/*.db-journal
 dev.db
 dev.db-journal
+
+# Images downloaded by the Notion sync
+/storage

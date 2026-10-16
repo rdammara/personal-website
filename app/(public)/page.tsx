@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { site } from '@/lib/site';
 import { formatDate, timeAgo, excerpt } from '@/lib/utils';
+import { getPublishedPosts, getLastNotionSync, postDate, postSummary } from '@/lib/posts';
 import { AskBar } from '@/components/AskBar';
 import { PipelineDiagram } from '@/components/PipelineDiagram';
 
@@ -16,14 +17,12 @@ function isGitHub(url: string) {
 }
 
 export default async function HomePage() {
-  const [posts, projects] = await Promise.all([
-    prisma.blogPost.findMany({ where: { published: true }, orderBy: { createdAt: 'desc' }, take: 3 }),
+  const [posts, projects, lastSync] = await Promise.all([
+    getPublishedPosts(3),
     prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 4 }),
+    getLastNotionSync(),
   ]);
-  const lastUpdate = posts.reduce<Date | null>(
-    (latest, p) => (latest && latest > p.updatedAt ? latest : p.updatedAt),
-    null
-  );
+  const syncedAt = lastSync?.finishedAt ?? null;
   const [featured, ...moreProjects] = projects;
 
   return (
@@ -116,7 +115,7 @@ export default async function HomePage() {
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
             <h2 className={h2}>Blog</h2>
             <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-              {lastUpdate && <span className="font-mono text-[14px] text-muted">Updated {timeAgo(lastUpdate)}</span>}
+              {syncedAt && <span className="font-mono text-[14px] text-muted">Synced from Notion {timeAgo(syncedAt)}</span>}
               <Link href="/blog" className="font-semibold text-accent hover:underline">
                 All posts
               </Link>
@@ -128,13 +127,13 @@ export default async function HomePage() {
             <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 max-sm:gap-7">
               {posts.map((post) => (
                 <article key={post.id} className="border-t-2 border-ink pt-5">
-                  <p className="font-mono text-[13px] text-muted">{formatDate(post.createdAt)}</p>
+                  <p className="font-mono text-[13px] text-muted">{formatDate(postDate(post))}</p>
                   <h3 className="mt-2.5 text-[22px] font-bold leading-tight tracking-[-0.01em]">
                     <Link href={`/blog/${post.slug}`} className="text-ink no-underline hover:text-accent">
                       {post.title}
                     </Link>
                   </h3>
-                  <p className="mt-2.5 text-muted">{excerpt(post.content, 120)}</p>
+                  <p className="mt-2.5 text-muted">{postSummary(post, 120)}</p>
                 </article>
               ))}
             </div>
@@ -148,10 +147,10 @@ export default async function HomePage() {
         <div className={container}>
           <h2 className={h2}>How this site works</h2>
           <p className="mb-12 mt-4 max-w-[36em] text-[19px] text-muted">
-            It runs on a small pipeline. The pages are built from a database, and the ask bar at the top searches the same
-            data. I’m building a sync from Notion next, so posts I write there publish here.
+            It runs on a small pipeline. {syncedAt ? 'I write posts in Notion, and a sync job copies them into the database every 15 minutes.' : 'I’m connecting a sync from Notion, so posts I write there publish here.'}{' '}
+            The pages are built from that database, and the ask bar at the top searches the same data.
           </p>
-          <PipelineDiagram />
+          <PipelineDiagram notionLive={Boolean(syncedAt)} />
         </div>
       </section>
 

@@ -93,7 +93,7 @@ npm run start
 npx prisma generate     # Regenerate Prisma Client
 npx prisma db push      # Push schema changes to SQLite
 npx prisma studio       # Launch interactive database GUI
-node prisma/seed.js     # Reseed database with sample records
+node prisma/seed.js     # Create the admin user if missing
 
 # PM2 Process Manager
 pm2 status              # View status of running instance

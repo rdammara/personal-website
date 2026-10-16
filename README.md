@@ -70,9 +70,10 @@ Configured in `prisma/schema.prisma` with the SQLite provider:
 - **BlogPost**: `id`, `title`, `slug`, `content`, `published`, `createdAt`, `updatedAt`
 - **Project**: `id`, `title`, `description`, `downloadUrl`, `externalUrl`, `createdAt`
 
-### Default Admin Credentials (from seed)
-- **Email**: `admin@example.com`
-- **Password**: `AdminPassword123!`
+### Admin User
+The seed creates an admin only when none exists, using `ADMIN_EMAIL` (default `admin@example.com`) and `ADMIN_PASSWORD` from the environment. Re-running the seed never changes an existing admin's password.
+
+`JWT_SECRET` must be set in `.env` to a long random value; login fails without it.
 
 ---
 

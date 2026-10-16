@@ -10,7 +10,7 @@ import { site } from '@/lib/site';
 const navItems = [
   { label: 'About', href: '/#about' },
   { label: 'Work', href: '/portfolio' },
-  { label: 'Writing', href: '/blog' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Resume', href: '/resume' },
   { label: 'Contact', href: '/contact' },
 ];

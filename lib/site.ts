@@ -4,7 +4,7 @@
 export const site = {
   name: 'Albert Richard Dammara',
   domain: 'albertdammara.com',
-  title: 'Data engineer for industrial and IoT data, with a quality engineer’s discipline.',
+  title: 'Data engineer for industrial and IoT data, with quality assurance discipline.',
   githubUrl: 'https://github.com/rdammara',
   contactEmail: null as string | null,
   resumePdfUrl: null as string | null,

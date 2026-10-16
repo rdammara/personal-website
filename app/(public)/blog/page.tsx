@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/PageHeader';
 
 export const revalidate = 0;
 
-export const metadata: Metadata = { title: 'Writing' };
+export const metadata: Metadata = { title: 'Blog' };
 
 export default async function BlogPage() {
   const posts = await prisma.blogPost.findMany({
@@ -16,7 +16,7 @@ export default async function BlogPage() {
 
   return (
     <div className="mx-auto max-w-[1180px] px-5 pb-30 sm:px-10 max-sm:pb-18">
-      <PageHeader title="Writing" intro="Notes on data engineering and the work around it." />
+      <PageHeader title="Blog"intro="Notes on data engineering and the work around it." />
 
       {posts.length === 0 ? (
         <p className="border-t border-line pt-8 text-muted">No posts are published yet.</p>

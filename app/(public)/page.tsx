@@ -111,10 +111,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="writing" className="scroll-mt-16 py-30 max-sm:py-18">
+      <section id="blog" className="scroll-mt-16 py-30 max-sm:py-18">
         <div className={container}>
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className={h2}>Writing</h2>
+            <h2 className={h2}>Blog</h2>
             <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
               {lastUpdate && <span className="font-mono text-[14px] text-muted">Updated {timeAgo(lastUpdate)}</span>}
               <Link href="/blog" className="font-semibold text-accent hover:underline">

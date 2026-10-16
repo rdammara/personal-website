@@ -6,17 +6,19 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // 1. Create or update default admin user
-  const passwordHash = await bcrypt.hash('AdminPassword123!', 10);
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
-    update: { passwordHash },
-    create: {
-      email: 'admin@example.com',
-      passwordHash,
-    },
-  });
-  console.log(`Created/updated admin user: ${admin.email}`);
+  // 1. Create the admin user if missing. An existing admin's password is never
+  // overwritten, so re-running the seed cannot reset it to a known value.
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+  if (existingAdmin) {
+    console.log(`Admin user ${adminEmail} already exists; password left unchanged.`);
+  } else if (!process.env.ADMIN_PASSWORD) {
+    console.log('Skipping admin user: set ADMIN_PASSWORD to create one.');
+  } else {
+    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
+    await prisma.user.create({ data: { email: adminEmail, passwordHash } });
+    console.log(`Created admin user: ${adminEmail}`);
+  }
 
   // 2. Seed blog posts
   const posts = [

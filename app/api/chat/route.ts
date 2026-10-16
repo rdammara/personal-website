@@ -15,19 +15,11 @@ export async function POST(req: NextRequest) {
     // 1. Retrieve knowledge chunks via RAG BM25 / semantic scoring
     const sources = await retrieveRagContext(message, 3);
 
-    // 2. Synthesize a response based on retrieved database documents
-    let reply = '';
-
-    if (sources.length > 0) {
-      const topSource = sources[0];
-      const contextSummary = sources
-        .map((s) => `[${s.source}]: ${s.content.slice(0, 200)}...`)
-        .join('\n\n');
-
-      reply = `Based on the project database records:\n\n${topSource.content}\n\nRelevant Sources Found: ${sources.map((s) => s.title).join(', ')}.`;
-    } else {
-      reply = `I couldn't find specific documentation matching "${message}" in the local database. You can browse our Blog and Portfolio sections, or ask about Next.js, App Router, or Prisma configuration.`;
-    }
+    // 2. No language model yet: reply with the best-matching passage, sources listed separately
+    const reply =
+      sources.length > 0
+        ? sources[0].content
+        : 'I couldn’t find anything on this site about that yet. Try asking about my background, my projects or my posts.';
 
     return NextResponse.json({
       reply,

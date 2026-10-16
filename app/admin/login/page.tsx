@@ -9,8 +9,8 @@ import { Shield, Lock, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = React.useState('admin@example.com');
-  const [password, setPassword] = React.useState('AdminPassword123!');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const [success, setSuccess] = React.useState(false);
@@ -97,11 +97,6 @@ export default function AdminLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
               />
-            </div>
-
-            <div className="text-xs bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg p-2.5 text-slate-600 dark:text-slate-400">
-              <span className="font-semibold text-blue-700 dark:text-blue-300">Default Seed Credentials:</span>
-              <div className="font-mono text-[11px] mt-0.5">admin@example.com / AdminPassword123!</div>
             </div>
 
             <Button type="submit" size="lg" className="w-full" disabled={loading}>

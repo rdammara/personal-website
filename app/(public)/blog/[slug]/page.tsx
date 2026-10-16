@@ -1,9 +1,8 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { formatDate } from '@/lib/utils';
-import { ArrowLeft, Calendar, User, Clock } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
+import { formatDate, excerpt } from '@/lib/utils';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -11,63 +10,41 @@ interface PageProps {
 
 export const revalidate = 0;
 
+async function getPost(slug: string) {
+  const post = await prisma.blogPost.findUnique({ where: { slug } });
+  if (!post || (!post.published && process.env.NODE_ENV === 'production')) return null;
+  return post;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const post = await getPost((await params).slug);
+  return post ? { title: post.title, description: excerpt(post.content, 155) } : {};
+}
+
 export default async function BlogPostDetailPage({ params }: PageProps) {
-  const { slug } = await params;
-
-  const post = await prisma.blogPost.findUnique({
-    where: { slug },
-  });
-
-  if (!post || (!post.published && process.env.NODE_ENV === 'production')) {
-    notFound();
-  }
+  const post = await getPost((await params).slug);
+  if (!post) notFound();
 
   return (
-    <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-      {/* Back link */}
-      <div>
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to all articles
-        </Link>
-      </div>
+    <article className="mx-auto max-w-[760px] px-5 pb-30 pt-16 sm:px-10 max-sm:pb-18 max-sm:pt-10">
+      <Link href="/blog" className="inline-flex min-h-11 items-center text-[15px] text-muted hover:text-accent">
+        All posts
+      </Link>
 
-      {/* Article Header */}
-      <header className="space-y-4 border-b border-slate-200 dark:border-slate-800 pb-8">
-        <div className="flex items-center gap-2">
-          <Badge variant="default">Engineering</Badge>
-          {!post.published && <Badge variant="secondary">Draft Preview</Badge>}
-        </div>
-
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight">
-          {post.title}
-        </h1>
-
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4" />
-            <span>{formatDate(post.createdAt)}</span>
-          </div>
-          <span>•</span>
-          <div className="flex items-center gap-1.5">
-            <User className="w-4 h-4" />
-            <span>DevPortfolio Staff</span>
-          </div>
-          <span>•</span>
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4" />
-            <span>3 min read</span>
-          </div>
-        </div>
+      <header className="mt-6 border-b border-line pb-8">
+        {!post.published && (
+          <p className="mb-3 font-mono text-[13px] text-accent">Draft: only visible in development</p>
+        )}
+        <h1 className="m-0 text-[clamp(32px,4.6vw,52px)] font-bold leading-[1.08] tracking-[-0.03em]">{post.title}</h1>
+        <p className="mb-0 mt-5 font-mono text-[14px] text-muted">
+          {formatDate(post.createdAt)}
+          {post.updatedAt.getTime() - post.createdAt.getTime() > 60_000 && ` · updated ${formatDate(post.updatedAt)}`}
+        </p>
       </header>
 
-      {/* Article Body */}
-      <div className="prose prose-slate dark:prose-invert max-w-none text-slate-800 dark:text-slate-200 leading-relaxed space-y-6 text-base sm:text-lg">
+      <div className="mt-10 space-y-6 text-[19px] leading-relaxed">
         {post.content.split('\n\n').map((paragraph, idx) => (
-          <p key={idx} className="whitespace-pre-line">
+          <p key={idx} className="m-0 whitespace-pre-line">
             {paragraph}
           </p>
         ))}

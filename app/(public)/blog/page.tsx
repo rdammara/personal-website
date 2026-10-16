@@ -1,11 +1,12 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { formatDate } from '@/lib/utils';
-import { BookOpen, ArrowRight, Calendar } from 'lucide-react';
+import { formatDate, excerpt } from '@/lib/utils';
+import { PageHeader } from '@/components/PageHeader';
 
 export const revalidate = 0;
+
+export const metadata: Metadata = { title: 'Writing' };
 
 export default async function BlogPage() {
   const posts = await prisma.blogPost.findMany({
@@ -14,58 +15,30 @@ export default async function BlogPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-      {/* Header */}
-      <div className="max-w-2xl space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-          <BookOpen className="w-3.5 h-3.5" />
-          Technical Publications
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 dark:text-white">
-          Blog & Engineering Notes
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Deep dives into full-stack development, modern web architecture, and AI-assisted workflows.
-        </p>
-      </div>
+    <div className="mx-auto max-w-[1180px] px-5 pb-30 sm:px-10 max-sm:pb-18">
+      <PageHeader title="Writing" intro="Notes on data engineering and the work around it." />
 
-      {/* Posts Grid */}
       {posts.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl">
-          <p className="text-slate-500">No published articles yet. Create one from the Admin Dashboard!</p>
-        </div>
+        <p className="border-t border-line pt-8 text-muted">No posts are published yet.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ol className="m-0 list-none p-0">
           {posts.map((post) => (
-            <Card key={post.id} className="flex flex-col justify-between hover:shadow-lg transition-all hover:border-blue-500/40">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-2">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{formatDate(post.createdAt)}</span>
-                  <span>•</span>
-                  <Badge variant="secondary">Published</Badge>
-                </div>
-                <CardTitle className="text-xl leading-snug">
-                  <Link href={`/blog/${post.slug}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <li
+              key={post.id}
+              className="grid gap-1.5 border-t border-line py-7 last:border-b sm:grid-cols-[150px_minmax(0,1fr)] sm:gap-6"
+            >
+              <p className="m-0 font-mono text-[13px] text-muted sm:pt-1.5">{formatDate(post.createdAt)}</p>
+              <div>
+                <h2 className="m-0 text-[24px] font-bold leading-tight tracking-[-0.01em]">
+                  <Link href={`/blog/${post.slug}`} className="text-ink no-underline hover:text-accent">
                     {post.title}
                   </Link>
-                </CardTitle>
-                <CardDescription className="line-clamp-3 mt-3 leading-relaxed">
-                  {post.content}
-                </CardDescription>
-              </CardHeader>
-              <CardFooter className="border-t border-slate-100 dark:border-slate-800/80 pt-4">
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1.5"
-                >
-                  Read full article
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </CardFooter>
-            </Card>
+                </h2>
+                <p className="mb-0 mt-2 max-w-[40em] text-muted">{excerpt(post.content, 200)}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </div>
   );

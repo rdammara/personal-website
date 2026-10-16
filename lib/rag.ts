@@ -1,4 +1,5 @@
 import { prisma } from './prisma';
+import { site } from './site';
 
 export interface DocumentChunk {
   id: string;
@@ -98,13 +99,23 @@ export async function retrieveRagContext(query: string, limit: number = 3): Prom
 
     const candidateChunks: DocumentChunk[] = [];
 
+    // The About text lives in code rather than the database
+    site.about.forEach((paragraph, index) => {
+      candidateChunks.push({
+        id: `about-${index}`,
+        source: 'About (/#about)',
+        title: 'About Albert',
+        content: paragraph,
+      });
+    });
+
     // Chunk blog posts
     for (const post of posts) {
       const chunks = chunkText(post.content);
       chunks.forEach((chunk, index) => {
         candidateChunks.push({
           id: `blog-${post.id}-${index}`,
-          source: `Blog: ${post.title} (/blog/${post.slug})`,
+          source: `Post: ${post.title} (/blog/${post.slug})`,
           title: post.title,
           content: chunk,
         });

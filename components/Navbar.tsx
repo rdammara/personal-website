@@ -4,104 +4,78 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from './ThemeToggle';
-import { Menu, X, Terminal, Shield, Home, BookOpen, Briefcase, Mail } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { LogoMark } from './Logo';
+import { site } from '@/lib/site';
 
 const navItems = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Blog', href: '/blog', icon: BookOpen },
-  { label: 'Portfolio', href: '/portfolio', icon: Briefcase },
-  { label: 'Contact', href: '/contact', icon: Mail },
+  { label: 'About', href: '/#about' },
+  { label: 'Work', href: '/portfolio' },
+  { label: 'Writing', href: '/blog' },
+  { label: 'Resume', href: '/resume' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const isActive = (href: string) => !href.startsWith('/#') && pathname.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md transition-colors">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 font-bold text-lg text-slate-900 dark:text-white tracking-tight">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
-            <Terminal className="w-4 h-4" />
-          </div>
-          <span>DevPortfolio<span className="text-blue-600">.</span></span>
+    <header className="sticky top-0 z-40 border-b border-line bg-bg">
+      <div className="mx-auto flex h-[60px] max-w-[1180px] items-center justify-between gap-4 px-5 sm:px-10">
+        <Link
+          href="/"
+          className="inline-flex min-h-11 min-w-0 items-center gap-2.5 text-base font-bold leading-tight tracking-[-0.01em] text-ink no-underline sm:text-lg"
+        >
+          <LogoMark className="h-8 w-7 shrink-0" />
+          <span>{site.name}</span>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-            return (
+        <div className="flex items-center gap-2">
+          <nav aria-label="Main" className="hidden items-center md:flex">
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  'px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
-                )}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                className="px-3 py-3 text-[15px] text-ink no-underline hover:text-accent aria-[current=page]:text-accent"
               >
                 {item.label}
               </Link>
-            );
-          })}
-        </nav>
-
-        {/* Actions (Admin Link + Theme Toggle + Mobile Menu Button) */}
-        <div className="flex items-center gap-2.5">
-          <Link
-            href="/admin"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          >
-            <Shield className="w-3.5 h-3.5 text-blue-600" />
-            Dashboard
-          </Link>
+            ))}
+          </nav>
           <ThemeToggle />
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-            aria-label="Open mobile menu"
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            className="inline-flex h-11 cursor-pointer items-center rounded-lg border border-line px-3.5 text-[15px] text-ink md:hidden"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            Menu
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-2 pb-4 space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium transition-colors',
-                  isActive
-                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-          <Link
-            href="/admin"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-          >
-            <Shield className="w-4 h-4 text-blue-600" />
-            Admin Dashboard
-          </Link>
-        </div>
+      {menuOpen && (
+        <nav
+          id="mobile-menu"
+          aria-label="Mobile"
+          className="mx-auto flex max-w-[1180px] flex-col px-5 pb-3 sm:px-10 md:hidden"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setMenuOpen(false)}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+              className="py-3 text-xl font-semibold text-ink no-underline aria-[current=page]:text-accent"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       )}
     </header>
   );

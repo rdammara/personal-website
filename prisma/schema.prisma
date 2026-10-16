@@ -49,3 +49,13 @@ model Project {
   externalUrl String?
   createdAt   DateTime @default(now())
 }
+
+// Uploaded resume PDFs; the newest row is the current resume
+model ResumeFile {
+  id         String   @id @default(cuid())
+  fileName   String // Name it had when uploaded
+  bytes      Int
+  pages      Int
+  text       String // Extracted text, for the resume page and the ask bar
+  uploadedAt DateTime @default(now())
+}

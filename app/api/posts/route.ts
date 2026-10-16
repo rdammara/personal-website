@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getSessionUser, unauthorized } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const publishedOnly = searchParams.get('published') === 'true';
+    // Drafts are only listed for a signed-in admin
+    const publishedOnly = searchParams.get('published') === 'true' || !(await getSessionUser());
 
     const posts = await prisma.blogPost.findMany({
       where: publishedOnly ? { published: true } : undefined,
@@ -18,6 +20,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await getSessionUser())) return unauthorized();
+
   try {
     const body = await req.json();
     const { title, slug, content, published } = body;

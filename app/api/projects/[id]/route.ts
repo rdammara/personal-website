@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getSessionUser, unauthorized } from '@/lib/auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -19,6 +20,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  if (!(await getSessionUser())) return unauthorized();
+
   try {
     const { id } = await params;
     const body = await req.json();
@@ -41,6 +44,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 }
 
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
+  if (!(await getSessionUser())) return unauthorized();
+
   try {
     const { id } = await params;
     await prisma.project.delete({ where: { id } });

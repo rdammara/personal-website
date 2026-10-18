@@ -179,7 +179,7 @@ export function AskBar() {
         </form>
       </div>
       <p className="mt-3 text-center text-sm text-muted">
-        Answers come from this website and my resume, nothing else.
+        Answers come from this website and my resume. They’re written by AI and can be wrong.
       </p>
     </div>
   );

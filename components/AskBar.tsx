@@ -7,7 +7,7 @@ interface Message {
   id: number;
   from: 'visitor' | 'site';
   text: string;
-  sources?: string[];
+  sources?: { label: string; href: string }[];
   failed?: boolean;
 }
 
@@ -26,6 +26,8 @@ export function AskBar() {
     const question = draft.trim();
     if (!question || loading) return;
 
+    // Earlier turns go along so follow-up questions make sense; failed replies are left out
+    const history = messages.filter((m) => !m.failed).slice(-6).map(({ from, text }) => ({ from, text }));
     setMessages((prev) => [...prev, { id: Date.now(), from: 'visitor', text: question }]);
     setDraft('');
     setLoading(true);
@@ -34,26 +36,30 @@ export function AskBar() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify({ message: question, history }),
       });
+      if (res.status === 429) throw new Error('busy');
       if (!res.ok) throw new Error(`status ${res.status}`);
-      const data: { reply: string; sources?: { source: string }[] } = await res.json();
+      const data: { reply: string; sources?: { label: string; href: string }[] } = await res.json();
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now(),
           from: 'site',
           text: data.reply,
-          sources: data.sources?.map((s) => s.source),
+          sources: data.sources,
         },
       ]);
-    } catch {
+    } catch (error) {
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now(),
           from: 'site',
-          text: 'The answer could not be loaded. Check your connection and ask again.',
+          text:
+            (error as Error).message === 'busy'
+              ? 'That’s a lot of questions in a short time. Wait a minute and ask again.'
+              : 'The answer could not be loaded. Check your connection and ask again.',
           failed: true,
         },
       ]);
@@ -128,7 +134,17 @@ export function AskBar() {
                     {m.text}
                   </p>
                   {m.sources && m.sources.length > 0 && (
-                    <p className="mt-1.5 px-1 font-mono text-[13px] text-muted">From: {m.sources.join(' · ')}</p>
+                    <p className="mt-1.5 px-1 font-mono text-[13px] text-muted">
+                      From:{' '}
+                      {m.sources.map((s, i) => (
+                        <span key={`${s.label}-${i}`}>
+                          {i > 0 && ' · '}
+                          <a href={s.href} className="text-muted underline underline-offset-2 hover:text-accent">
+                            {s.label}
+                          </a>
+                        </span>
+                      ))}
+                    </p>
                   )}
                 </div>
               </div>

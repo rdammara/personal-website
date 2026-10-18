@@ -8,20 +8,21 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+    // Focus uses the site-wide :focus-visible outline from globals.css
+    const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
     const variants = {
-      primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm',
-      secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 focus:ring-slate-500',
-      outline: 'border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-slate-500',
-      ghost: 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 focus:ring-slate-500',
-      danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-sm',
+      primary: 'bg-fill text-onfill hover:brightness-95',
+      secondary: 'bg-surface text-ink hover:bg-line',
+      outline: 'border border-control text-ink hover:bg-surface',
+      ghost: 'text-ink hover:bg-surface',
+      danger: 'bg-red-700 text-white hover:bg-red-800',
     };
 
     const sizes = {
-      sm: 'text-xs px-2.5 py-1.5 gap-1.5',
-      md: 'text-sm px-4 py-2 gap-2',
-      lg: 'text-base px-6 py-2.5 gap-2.5',
+      sm: 'text-xs px-3 min-h-9 gap-1.5',
+      md: 'text-sm px-4 min-h-11 gap-2',
+      lg: 'text-base px-6 min-h-12 gap-2.5',
     };
 
     return (

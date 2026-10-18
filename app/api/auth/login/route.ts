@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifyPassword, signToken, COOKIE_NAME } from '@/lib/auth';
+import { verifyPassword, signToken, setSessionCookie } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,15 +40,7 @@ export async function POST(req: NextRequest) {
       user: { id: user.id, email: user.email },
     });
 
-    response.cookies.set(COOKIE_NAME, token, {
-      httpOnly: true,
-      // HTTPS-only when the visit is HTTPS (nginx passes X-Forwarded-Proto); a
-      // secure cookie sent over plain HTTP would be dropped and login would fail
-      secure: req.headers.get('x-forwarded-proto') === 'https' || req.nextUrl.protocol === 'https:',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-    });
+    setSessionCookie(req, response, token);
 
     return response;
   } catch (error: any) {

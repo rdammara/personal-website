@@ -89,10 +89,10 @@ export default function ManageProjectsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
           Manage Projects
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-muted">
           Create, view, and delete showcase projects stored in SQLite.
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function ManageProjectsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <PlusCircle className="w-5 h-5 text-blue-600" />
+            <PlusCircle className="w-5 h-5 text-accent" />
             Add New Project
           </CardTitle>
           <CardDescription>
@@ -111,7 +111,7 @@ export default function ManageProjectsPage() {
         <CardContent>
           <form onSubmit={handleCreateProject} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Project Title</label>
+              <label className="text-xs font-semibold text-ink">Project Title</label>
               <Input
                 required
                 placeholder="e.g. Real-Time Distributed Task Engine"
@@ -121,11 +121,11 @@ export default function ManageProjectsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Description</label>
+              <label className="text-xs font-semibold text-ink">Description</label>
               <textarea
                 required
                 rows={3}
-                className="flex w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex w-full rounded-lg border border-control bg-bg px-3 py-2 text-sm text-ink placeholder:text-muted"
                 placeholder="Describe project features, tech stack, and highlights..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -134,7 +134,7 @@ export default function ManageProjectsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">External URL (optional)</label>
+                <label className="text-xs font-semibold text-ink">External URL (optional)</label>
                 <Input
                   type="url"
                   placeholder="https://github.com/..."
@@ -144,7 +144,7 @@ export default function ManageProjectsPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Download URL (optional)</label>
+                <label className="text-xs font-semibold text-ink">Download URL (optional)</label>
                 <Input
                   type="url"
                   placeholder="https://.../download.zip"
@@ -178,21 +178,21 @@ export default function ManageProjectsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading projects...</div>
+            <div className="p-8 text-center text-muted">Loading projects...</div>
           ) : projects.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 border border-dashed rounded-lg">
+            <div className="p-8 text-center text-muted border border-dashed rounded-lg">
               No projects found.
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="divide-y divide-line">
               {projects.map((proj) => (
                 <div key={proj.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1 max-w-xl">
-                    <h3 className="font-semibold text-slate-900 dark:text-white">{proj.title}</h3>
-                    <p className="text-xs text-slate-500 line-clamp-2">{proj.description}</p>
-                    <div className="flex items-center gap-3 text-xs text-slate-400 pt-1">
+                    <h3 className="font-semibold text-ink">{proj.title}</h3>
+                    <p className="text-xs text-muted line-clamp-2">{proj.description}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted pt-1">
                       {proj.externalUrl && (
-                        <span className="flex items-center gap-1 text-blue-500">
+                        <span className="flex items-center gap-1 text-accent">
                           <ExternalLink className="w-3 h-3" /> External link
                         </span>
                       )}

@@ -41,7 +41,7 @@ export function UploadForm() {
   return (
     <form onSubmit={upload} className="space-y-4">
       <div>
-        <label htmlFor="resume-file" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+        <label htmlFor="resume-file" className="block text-sm font-medium text-ink">
           New resume (PDF, up to 10 MB)
         </label>
         <input
@@ -49,13 +49,13 @@ export function UploadForm() {
           ref={inputRef}
           type="file"
           accept="application/pdf,.pdf"
-          className="mt-2 block w-full text-sm text-slate-700 dark:text-slate-300 file:mr-4 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-slate-200 file:px-4 file:font-medium file:text-slate-900 dark:file:bg-slate-800 dark:file:text-slate-100"
+          className="mt-2 block w-full text-sm text-ink file:mr-4 file:min-h-11 file:cursor-pointer file:rounded-lg file:border-0 file:bg-surface file:px-4 file:font-medium file:text-ink"
         />
       </div>
       <button
         type="submit"
         disabled={status.kind === 'uploading'}
-        className="inline-flex min-h-11 cursor-pointer items-center rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+        className="inline-flex min-h-11 cursor-pointer items-center rounded-lg bg-fill px-5 text-sm font-semibold text-onfill hover:brightness-95 disabled:cursor-wait disabled:opacity-60"
       >
         {status.kind === 'uploading' ? 'Uploading and reading the PDF…' : 'Upload and replace'}
       </button>

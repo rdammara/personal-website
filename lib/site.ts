@@ -4,13 +4,13 @@
 export const site = {
   name: 'Albert Richard Dammara',
   domain: 'albertdammara.com',
-  title: 'Data engineer for industrial and IoT data, with quality assurance discipline.',
+  title: 'Software and data engineer for industrial and IoT systems, with a quality-first approach.',
   githubUrl: 'https://github.com/rdammara',
   contactEmail: 'albertdammara@gmail.com' as string | null,
   linkedinUrl: 'https://linkedin.com/in/rdammara',
   about: [
-    'I’m a data engineer with a background in Information Systems and a minor in Big Data Analytics. My most hands-on work was in industrial manufacturing at an industrial piping manufacturing company, where I designed and deployed real-time pipelines to ingest and visualize sensor data across production sites, and worked with technical and business stakeholders to connect edge data to the central MES. I then moved into industrial analytics, using machine sensor data to support predictive maintenance and equipment reliability decisions.',
-    'Today I work as a Software Quality Engineer, and that shapes how I build: pipelines should fail loudly, data should be tested before anyone trusts it, and monitoring should surface problems early. This site documents my projects, including the code, architecture decisions, and quality checks behind each one.',
+    "I'm a software and data engineer with a background in Information Systems and a minor in Big Data Analytics. My most hands-on work was in industrial manufacturing at an industrial piping manufacturing company, where I designed and deployed real-time pipelines to ingest and visualize sensor data across production sites, and worked with technical and business stakeholders to connect edge data to the central MES. I then moved into industrial analytics, using machine sensor data to support predictive maintenance and equipment reliability decisions.",
+    "Today I work as a Software Quality Engineer, and that shapes how I build software and data systems: pipelines should fail loudly, data should be tested before anyone trusts it, and monitoring should surface problems early. This site documents my projects, including the code, architecture decisions, and quality checks behind each one.",
   ],
 };
 

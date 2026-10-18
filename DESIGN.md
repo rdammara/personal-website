@@ -5,7 +5,7 @@ Written from Albert's answers on 2026-10-14. This is the direction the antislop 
 ## Identity
 
 - Owner: Albert Richard Dammara
-- Role: data engineer for industrial and IoT data. Background in Information Systems (minor in Big Data Analytics), industrial manufacturing data and industrial analytics. Currently a Software Quality Engineer.
+- Role: software and data engineer for industrial and IoT systems, with a quality-first approach. Background in Information Systems (minor in Big Data Analytics), industrial manufacturing data and industrial analytics. Currently a Software Quality Engineer.
 - Domain: albertdammara.com (bought, not yet pointed at this server)
 - Name: always written in full, "Albert Richard Dammara", including next to the logo.
 - Logo: a dark-blue hexagon with an "A" cut through it and three orange bars inside. On dark backgrounds the hexagon turns light. Waiting on the original SVG file.

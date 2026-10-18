@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   // Absolute links in shared previews and the sitemap point at the real domain
   metadataBase: new URL(`https://${site.domain}`),
   title: {
-    default: `${site.name}: data engineer`,
+    default: `${site.name}: software and data engineer`,
     template: `%s · ${site.name}`,
   },
   description: site.title,

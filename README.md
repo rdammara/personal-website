@@ -105,6 +105,17 @@ tail -n 30 ~/apps/albertdammara.com/shared/deploy.log   # recent deploys
 pm2 logs personal-website                               # live server log
 ```
 
+### Ask bar settings (`.env`)
+
+```
+OPENROUTER_API_KEY="sk-or-..."      # without it, the ask bar uses keyword search
+OPENROUTER_MODEL="openrouter/free"  # or a list tried in order, e.g. "openrouter/free,anthropic/claude-haiku-5.5"
+ASK_DAILY_LIMIT=300                 # AI answers per day before falling back to keyword search
+```
+
+Each question gets at most two tries of 14 seconds. A reply that is not the expected JSON
+counts as a failed try. After two failures the keyword search answers instead.
+
 ### Development preview
 
 This checkout (`~/personal-website`, branch `development`) runs as

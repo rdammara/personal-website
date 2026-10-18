@@ -59,3 +59,9 @@ model ResumeFile {
   text       String // Extracted text, for the resume page and the ask bar
   uploadedAt DateTime @default(now())
 }
+
+// Count of AI ask-bar answers per UTC day, for the daily cap
+model AskUsage {
+  day   String @id // YYYY-MM-DD
+  count Int    @default(0)
+}

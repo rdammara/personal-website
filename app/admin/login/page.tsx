@@ -1,11 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Shield, Lock, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { LogoMark } from '@/components/Logo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -13,7 +14,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
-  const [success, setSuccess] = React.useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,85 +26,72 @@ export default function AdminLoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
+      if (res.status === 429) throw new Error('Too many attempts. Wait a minute and try again.');
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Sign-in failed.');
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/admin');
-        router.refresh();
-      }, 500);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
+      router.push('/admin');
+      router.refresh();
+    } catch (err) {
+      setError((err as Error).message);
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto py-12">
-      <Card className="shadow-lg">
-        <CardHeader className="text-center">
-          <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mx-auto mb-2 shadow-md">
-            <Shield className="w-6 h-6" />
-          </div>
-          <CardTitle className="text-2xl">Admin Authentication</CardTitle>
-          <CardDescription>
-            Access the protected CRUD administration dashboard.
-          </CardDescription>
-        </CardHeader>
+    <div className="flex min-h-screen flex-col bg-surface">
+      <header className="flex items-center justify-between gap-4 px-5 py-3 sm:px-8">
+        <Link href="/" className="inline-flex min-h-11 items-center text-sm text-muted no-underline hover:text-accent">
+          Back to the site
+        </Link>
+        <ThemeToggle />
+      </header>
 
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            {error && (
-              <div className="p-3 text-xs bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+      <main className="flex flex-1 items-start justify-center px-5 pb-16 pt-10 sm:pt-20">
+        <div className="w-full max-w-sm rounded-2xl border border-line bg-bg p-8 max-sm:p-6">
+          <LogoMark className="h-12 w-11" />
+          <h1 className="mb-0 mt-5 text-2xl font-bold tracking-[-0.02em]">Sign in</h1>
+          <p className="mb-0 mt-1 text-[15px] text-muted">Admin for albertdammara.com</p>
 
-            {success && (
-              <div className="p-3 text-xs bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-lg flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Authenticated! Redirecting to dashboard...</span>
-              </div>
-            )}
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5" /> Email
+          <form onSubmit={handleLogin} className="mt-7 space-y-4">
+            <div>
+              <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
+                Email
               </label>
               <Input
+                id="email"
                 type="email"
+                autoComplete="username"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                placeholder="email@example.com"
               />
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" /> Password
+            <div>
+              <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
+                Password
               </label>
               <Input
+                id="password"
                 type="password"
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
               />
             </div>
 
+            <p role="alert" className="min-h-5 text-sm text-red-700 dark:text-red-400">
+              {error}
+            </p>
+
             <Button type="submit" size="lg" className="w-full" disabled={loading}>
-              {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
+              {loading ? 'Signing in…' : 'Sign in'}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </main>
     </div>
   );
 }

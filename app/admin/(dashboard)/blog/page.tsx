@@ -108,10 +108,10 @@ export default function ManageBlogPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight">
           Manage Blog Posts
         </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-muted">
           Create, edit, toggle publishing, and delete articles saved in SQLite.
         </p>
       </div>
@@ -120,7 +120,7 @@ export default function ManageBlogPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <PlusCircle className="w-5 h-5 text-blue-600" />
+            <PlusCircle className="w-5 h-5 text-accent" />
             Create New Article
           </CardTitle>
           <CardDescription>
@@ -131,7 +131,7 @@ export default function ManageBlogPage() {
           <form onSubmit={handleCreatePost} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Title</label>
+                <label className="text-xs font-semibold text-ink">Title</label>
                 <Input
                   required
                   placeholder="e.g. Next.js Server Actions Demystified"
@@ -141,7 +141,7 @@ export default function ManageBlogPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">URL Slug</label>
+                <label className="text-xs font-semibold text-ink">URL Slug</label>
                 <Input
                   required
                   placeholder="e.g. nextjs-server-actions-demystified"
@@ -152,11 +152,11 @@ export default function ManageBlogPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Content</label>
+              <label className="text-xs font-semibold text-ink">Content</label>
               <textarea
                 required
                 rows={5}
-                className="flex w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex w-full rounded-lg border border-control bg-bg px-3 py-2 text-sm text-ink placeholder:text-muted"
                 placeholder="Write full article markdown or text..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -164,12 +164,12 @@ export default function ManageBlogPage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+              <label className="flex items-center gap-2 text-sm font-medium text-ink cursor-pointer">
                 <input
                   type="checkbox"
                   checked={published}
                   onChange={(e) => setPublished(e.target.checked)}
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                  className="rounded border-control text-accent w-4 h-4"
                 />
                 Publish immediately
               </label>
@@ -197,24 +197,24 @@ export default function ManageBlogPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading articles...</div>
+            <div className="p-8 text-center text-muted">Loading articles...</div>
           ) : posts.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 border border-dashed rounded-lg">
+            <div className="p-8 text-center text-muted border border-dashed rounded-lg">
               No articles found.
             </div>
           ) : (
-            <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            <div className="divide-y divide-line">
               {posts.map((post) => (
                 <div key={post.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="space-y-1 max-w-xl">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-900 dark:text-white">{post.title}</h3>
+                      <h3 className="font-semibold text-ink">{post.title}</h3>
                       <Badge variant={post.published ? 'success' : 'secondary'}>
                         {post.published ? 'Published' : 'Draft'}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-500 line-clamp-1">{post.content}</p>
-                    <div className="text-[11px] text-slate-400 font-mono">/blog/{post.slug}</div>
+                    <p className="text-xs text-muted line-clamp-1">{post.content}</p>
+                    <div className="text-[11px] text-muted font-mono">/blog/{post.slug}</div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">

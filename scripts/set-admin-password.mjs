@@ -58,8 +58,11 @@ async function main() {
   const repeat = await askHidden('Type it again: ');
   if (repeat !== password) throw new Error('The two entries did not match. Nothing changed.');
 
-  await prisma.user.update({ where: { email }, data: { passwordHash: await bcrypt.hash(password, 12) } });
-  console.log('Password changed. Use it the next time you sign in at /admin/login.');
+  await prisma.user.update({
+    where: { email },
+    data: { passwordHash: await bcrypt.hash(password, 12), passwordChangedAt: new Date() },
+  });
+  console.log('Password changed, and every signed-in browser was signed out. Sign in again at /admin/login.');
 }
 
 main()

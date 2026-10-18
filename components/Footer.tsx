@@ -17,7 +17,7 @@ export function Footer() {
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-[1180px] flex-wrap justify-between gap-2 px-5 py-6 text-sm text-muted sm:px-10">
         <span>
-          {site.name} · {site.domain}
+          © {new Date().getFullYear()} {site.name}
         </span>
         {builtAt && <span className="font-mono text-[13px]">Site rebuilt {formatBuildTime(builtAt)}</span>}
       </div>

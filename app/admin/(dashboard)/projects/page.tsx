@@ -14,6 +14,7 @@ interface Project {
   description: string;
   downloadUrl: string | null;
   externalUrl: string | null;
+  githubId: number | null;
   createdAt: string;
 }
 
@@ -206,13 +207,21 @@ export default function ManageProjectsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDelete(proj.id)}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    {proj.githubId ? (
+                      // Mirrored projects come and go with the "portfolio" topic on GitHub
+                      <span className="max-w-[16rem] text-right text-xs text-muted">
+                        From GitHub. Remove the <span className="font-mono">portfolio</span> topic there to hide it.
+                      </span>
+                    ) : (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDelete(proj.id)}
+                        aria-label={`Delete ${proj.title}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}

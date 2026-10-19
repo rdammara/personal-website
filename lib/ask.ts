@@ -49,7 +49,7 @@ async function gatherSources() {
       id: `project-${project.id}`,
       label: `Project: ${project.title}`,
       href: '/portfolio',
-      text: `${project.title}. ${project.description}`,
+      text: `${project.title}. ${project.description}${project.language ? ` Main language: ${project.language}.` : ''} Code: ${project.externalUrl ?? 'not linked'}.`,
     });
   }
   for (const post of posts) {

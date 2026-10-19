@@ -12,7 +12,8 @@
     "prisma:seed": "node prisma/seed.js",
     "prisma:studio": "prisma studio",
     "sync:notion": "node --env-file=.env scripts/sync-notion.mjs",
-    "set-admin-password": "node scripts/set-admin-password.mjs"
+    "set-admin-password": "node scripts/set-admin-password.mjs",
+    "sync:github": "node --env-file=.env scripts/sync-github.mjs"
   },
   "dependencies": {
     "@notionhq/client": "5.27.0",

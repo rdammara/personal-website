@@ -43,12 +43,20 @@ model SyncRun {
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  downloadUrl String?
-  externalUrl String?
-  createdAt   DateTime @default(now())
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  downloadUrl   String?
+  externalUrl   String?
+  // Set for projects mirrored from GitHub. Not @unique: adding a unique constraint makes
+  // `prisma db push` warn about data loss, which stops deploy.sh; the sync keeps one row per repo
+  githubId      Int?
+  language      String? // GitHub's main language for the repo
+  homepageUrl   String? // The repo's "Website" field on GitHub
+  repoUpdatedAt DateTime? // Last push to the repo
+  createdAt     DateTime  @default(now())
+
+  @@index([githubId])
 }
 
 // Uploaded resume PDFs; the newest row is the current resume

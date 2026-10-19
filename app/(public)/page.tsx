@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import { site } from '@/lib/site';
 import { formatDate, timeAgo, excerpt } from '@/lib/utils';
 import { getPublishedPosts, getLastNotionSync, postDate, postSummary } from '@/lib/posts';
 import { getCurrentResume } from '@/lib/resume-file';
+import { getProjects, getLastGithubSync, projectDate } from '@/lib/projects';
 import { AskBar } from '@/components/AskBar';
 import { PipelineDiagram } from '@/components/PipelineDiagram';
 
@@ -18,11 +18,12 @@ function isGitHub(url: string) {
 }
 
 export default async function HomePage() {
-  const [posts, projects, lastSync, resume] = await Promise.all([
+  const [posts, projects, lastSync, resume, githubSync] = await Promise.all([
     getPublishedPosts(3),
-    prisma.project.findMany({ orderBy: { createdAt: 'desc' }, take: 4 }),
+    getProjects(4),
     getLastNotionSync(),
     getCurrentResume(),
+    getLastGithubSync(),
   ]);
   const syncedAt = lastSync?.finishedAt ?? null;
   const [featured, ...moreProjects] = projects;
@@ -75,23 +76,40 @@ export default async function HomePage() {
           {featured ? (
             <div className="grid gap-12 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
               <div>
-                <p className="font-mono text-[13px] text-bandmuted">Latest · {formatDate(featured.createdAt)}</p>
+                <p className="font-mono text-[13px] text-bandmuted">
+                  Updated {formatDate(projectDate(featured))}
+                  {featured.language && ` · ${featured.language}`}
+                </p>
                 <h3 className="mt-2 text-[30px] font-bold leading-tight tracking-[-0.02em]">{featured.title}</h3>
-                <p className="mt-4 text-bandmuted">{featured.description}</p>
-                {featured.externalUrl && (
-                  <p className="mt-7 font-semibold">
+                <p className="mt-4 text-bandmuted">{featured.description || 'No description yet.'}</p>
+                <p className="mt-7 flex flex-wrap gap-x-6 gap-y-2 font-semibold">
+                  {featured.externalUrl && (
                     <a href={featured.externalUrl} className="text-bandaccent hover:underline">
                       {isGitHub(featured.externalUrl) ? 'View the code on GitHub' : 'Visit the project'}
                     </a>
-                  </p>
-                )}
+                  )}
+                  {featured.homepageUrl && (
+                    <a href={featured.homepageUrl} className="text-bandaccent hover:underline">
+                      Visit the live site
+                    </a>
+                  )}
+                </p>
               </div>
               {moreProjects.length > 0 && (
                 <ul className="m-0 list-none p-0">
                   {moreProjects.map((p) => (
                     <li key={p.id} className="border-t border-bandline py-5">
-                      <p className="font-semibold">{p.title}</p>
-                      <p className="mt-1 text-[15px] text-bandmuted">{excerpt(p.description, 110)}</p>
+                      <p className="font-semibold">
+                        {p.externalUrl ? (
+                          <a href={p.externalUrl} className="text-onband no-underline hover:text-bandaccent">
+                            {p.title}
+                          </a>
+                        ) : (
+                          p.title
+                        )}
+                      </p>
+                      {p.language && <p className="mt-0.5 font-mono text-[13px] text-bandmuted">{p.language}</p>}
+                      <p className="mt-1 text-[15px] text-bandmuted">{excerpt(p.description || 'No description yet.', 110)}</p>
                     </li>
                   ))}
                 </ul>
@@ -105,9 +123,14 @@ export default async function HomePage() {
             <Link href="/portfolio" className="font-semibold text-onband hover:text-bandaccent">
               All work
             </Link>
-            <a href={site.githubUrl} className="text-bandmuted hover:text-bandaccent">
-              All repositories on GitHub
-            </a>
+            <span className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+              {githubSync?.finishedAt && (
+                <span className="font-mono text-[14px] text-bandmuted">Synced from GitHub {timeAgo(githubSync.finishedAt)}</span>
+              )}
+              <a href={site.githubUrl} className="text-bandmuted hover:text-bandaccent">
+                All repositories on GitHub
+              </a>
+            </span>
           </div>
         </div>
       </section>

@@ -116,6 +116,15 @@ ASK_DAILY_LIMIT=300                 # AI answers per day before falling back to 
 Each question gets at most two tries of 14 seconds. A reply that is not the expected JSON
 counts as a failed try. After two failures the keyword search answers instead.
 
+### Projects from GitHub
+
+The Work section mirrors public repos on github.com/rdammara that have the
+`portfolio` topic (set it with the gear icon next to "About" on the repo page).
+`scripts/sync-github.mjs` runs hourly under PM2 (`github-sync`), takes the description
+from the repo's About text or, failing that, the README's first paragraph, skips forks,
+and removes projects whose repo loses the topic. `npm run sync:github` runs it now.
+Projects added in the admin dashboard are left alone.
+
 ### Development preview
 
 This checkout (`~/personal-website`, branch `development`) runs as

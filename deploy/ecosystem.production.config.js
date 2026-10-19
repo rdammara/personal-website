@@ -28,5 +28,15 @@ module.exports = {
       autorestart: false,
       time: true,
     },
+    {
+      // Hourly at :07, so it never starts alongside the Notion sync
+      name: 'github-sync',
+      cwd: current,
+      script: path.join(current, 'scripts/sync-github.mjs'),
+      node_args: '--env-file=.env',
+      cron_restart: '7 * * * *',
+      autorestart: false,
+      time: true,
+    },
   ],
 };

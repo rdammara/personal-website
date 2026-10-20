@@ -146,7 +146,7 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <p className="mb-12 mt-0 max-w-[36em] text-[19px] text-muted">Notes on data engineering and the work around it.</p>
+          <p className="mb-12 mt-0 max-w-[36em] text-[19px] text-muted">Notes and personal thoughts on life, technology, and the things I’m passionate about.</p>
 
           {posts.length > 0 ? (
             <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 max-sm:gap-7">

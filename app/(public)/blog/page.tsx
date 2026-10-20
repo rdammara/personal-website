@@ -13,7 +13,7 @@ export default async function BlogPage() {
 
   return (
     <div className="mx-auto max-w-[1180px] px-5 pb-30 sm:px-10 max-sm:pb-18">
-      <PageHeader title="Blog"intro="Notes on data engineering and the work around it." />
+      <PageHeader title="Blog" intro="Notes and personal thoughts on life, technology, and the things I’m passionate about." />
 
       {posts.length === 0 ? (
         <p className="border-t border-line pt-8 text-muted">No posts are published yet.</p>

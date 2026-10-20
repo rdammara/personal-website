@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { site } from '@/lib/site';
 import { formatDate, timeAgo, excerpt } from '@/lib/utils';
-import { getPublishedPosts, getLastNotionSync, postDate, postSummary } from '@/lib/posts';
+import { getPublishedPosts, getLastNotionSync, postDate, postSummary, postThumbnail } from '@/lib/posts';
 import { getCurrentResume } from '@/lib/resume-file';
 import { getProjects, getLastGithubSync, projectDate } from '@/lib/projects';
 import { AskBar } from '@/components/AskBar';
@@ -152,6 +152,18 @@ export default async function HomePage() {
             <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 max-sm:gap-7">
               {posts.map((post) => (
                 <article key={post.id} className="border-t-2 border-ink pt-5">
+                  {postThumbnail(post) && (
+                    // A second way to click through; the title link already serves keyboards and screen readers
+                    <Link href={`/blog/${post.slug}`} tabIndex={-1} aria-hidden="true" className="mb-4 block">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- sizes come from Notion and are unknown here */}
+                      <img
+                        src={postThumbnail(post)!}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[16/10] w-full rounded-xl object-cover"
+                      />
+                    </Link>
+                  )}
                   <p className="font-mono text-[13px] text-muted">{formatDate(postDate(post))}</p>
                   <h3 className="mt-2.5 text-[22px] font-bold leading-tight tracking-[-0.01em]">
                     <Link href={`/blog/${post.slug}`} className="text-ink no-underline hover:text-accent">

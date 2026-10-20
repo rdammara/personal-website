@@ -7,7 +7,13 @@ const components: Components = {
   h2: ({ children }) => <h2 className="mb-0 mt-12 text-[28px] font-bold leading-tight tracking-[-0.02em]">{children}</h2>,
   h3: ({ children }) => <h3 className="mb-0 mt-10 text-[23px] font-bold leading-snug">{children}</h3>,
   h4: ({ children }) => <h4 className="mb-0 mt-8 text-[19px] font-bold">{children}</h4>,
-  p: ({ children }) => <p className="mb-0 mt-6">{children}</p>,
+  // A paragraph holding a photo renders as a div: the photo becomes a <figure>, which a <p> can't contain
+  p: ({ node, children }) =>
+    node?.children.some((child) => child.type === 'element' && child.tagName === 'img') ? (
+      <div className="mt-6">{children}</div>
+    ) : (
+      <p className="mb-0 mt-6">{children}</p>
+    ),
   a: ({ href, children }) => (
     <a href={href} className="font-semibold text-accent underline underline-offset-2 hover:no-underline">
       {children}
@@ -30,10 +36,18 @@ const components: Components = {
     ) : (
       <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-[0.88em]">{children}</code>
     ),
-  img: ({ src, alt }) => (
-    // eslint-disable-next-line @next/next/no-img-element -- sizes come from Notion and are unknown here
-    <img src={typeof src === 'string' ? src : undefined} alt={alt ?? ''} loading="lazy" className="mt-6 h-auto max-w-full rounded-xl" />
-  ),
+  // Notion captions arrive as alt text; they are shown under the photo. The figcaption already
+  // describes the photo to screen readers, so the image itself gets alt="" to avoid reading it twice.
+  img: ({ src, alt }) => {
+    const caption = (alt ?? '').replace(/\s+/g, ' ').trim();
+    return (
+      <figure className="m-0">
+        {/* eslint-disable-next-line @next/next/no-img-element -- sizes come from Notion and are unknown here */}
+        <img src={typeof src === 'string' ? src : undefined} alt="" loading="lazy" className="h-auto max-w-full rounded-xl" />
+        {caption && <figcaption className="mt-2.5 text-center text-[15px] leading-snug text-muted">{caption}</figcaption>}
+      </figure>
+    );
+  },
   table: ({ children }) => (
     <div className="mt-6 overflow-x-auto">
       <table className="w-full border-collapse text-[16px]">{children}</table>

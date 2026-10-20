@@ -21,3 +21,10 @@ export async function getPublishedPosts(take?: number) {
 export async function getLastNotionSync() {
   return prisma.syncRun.findFirst({ where: { source: 'notion', ok: true }, orderBy: { startedAt: 'desc' } });
 }
+
+// The first photo in a post, used as its thumbnail in post lists (null when it has none).
+// Only images the sync stored locally or https images count.
+export function postThumbnail(post: { content: string }) {
+  const match = post.content.match(/!\[[^\]]*\]\(((?:\/media\/|https:\/\/)[^)\s]+)\)/);
+  return match ? match[1] : null;
+}

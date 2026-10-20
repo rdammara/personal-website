@@ -130,7 +130,9 @@ export async function blocksToMd(notion, blocks, depth = 0) {
         out.push('---');
         break;
       case 'image': {
-        const alt = escapeMd(plain(data.caption)) || 'Image';
+        // The caption becomes the alt text, which the site shows under the photo. Notion keeps
+        // line breaks inside captions; they are folded into spaces. No caption means alt "".
+        const alt = escapeMd(plain(data.caption).replace(/\s+/g, ' ').trim());
         const src = data.type === 'file' ? await downloadImage(data.file.url) : data.external.url;
         out.push(`![${alt}](${src})`);
         break;

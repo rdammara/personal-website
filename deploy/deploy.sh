@@ -74,12 +74,40 @@ cp -p "$DB_FILE" "$BASE/shared/backups/prod-$(date -u +%Y%m%dT%H%M%SZ)-before-$S
 npx prisma db push --skip-generate || fail "database schema update (would it lose data?)"
 
 npm run build || fail "next build"
-# The build cache only speeds up the next build of this same folder, which never happens
-rm -rf "$RELEASE/.next/cache"
+
+# The site runs from .next/standalone (output: 'standalone' in next.config.ts), which holds
+# only the files it needs. It serves public/ and .next/static only when they are copied in,
+# and reads secrets and uploads from shared/ through links, so a changed .env applies on reload.
+SA="$RELEASE/.next/standalone"
+[[ -f "$SA/server.js" ]] || fail "standalone build missing"
+cp -r "$RELEASE/public" "$SA/public"
+cp -r "$RELEASE/.next/static" "$SA/.next/static"
+rm -f "$SA/.env"
+ln -s "$BASE/shared/.env" "$SA/.env"
+ln -sfn "$BASE/shared/storage" "$SA/storage"
+# Build-only files: node_modules (~850 MB) and the build cache. Schema changes ran above.
+rm -rf "$RELEASE/node_modules" "$RELEASE/.next/cache"
+
+# Reload PM2 from the live release's config. Reload keeps each app's script path, so when a
+# release runs the site differently (next start vs standalone server.js), the apps are
+# restarted instead; that costs a couple of seconds of downtime, once.
+apply_pm2() {
+  local config="$BASE/current/deploy/ecosystem.production.config.js"
+  local want have
+  want=$(node -e "console.log(require('$config').apps.find((a) => a.name === 'personal-website').script)")
+  have=$(pm2 jlist | node -e 'let d="";process.stdin.on("data",(c)=>(d+=c)).on("end",()=>{const a=JSON.parse(d).find((p)=>p.name==="personal-website");console.log(a?a.pm2_env.pm_exec_path:"")})')
+  if [[ "$want" == "$have" ]]; then
+    pm2 startOrReload "$config" --update-env >/dev/null
+  else
+    log "PM2 apps now run $(basename "$want"); restarting them"
+    pm2 delete personal-website notion-sync github-sync >/dev/null 2>&1 || true
+    pm2 start "$config" >/dev/null
+  fi
+}
 
 PREVIOUS=$(readlink -f "$BASE/current" 2>/dev/null || true)
 ln -sfn "$RELEASE" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
-pm2 startOrReload "$BASE/current/deploy/ecosystem.production.config.js" --update-env >/dev/null
+apply_pm2
 
 # Give the server a moment, then make sure it answers; roll back if not
 ok=""
@@ -90,7 +118,7 @@ done
 if [[ -z "$ok" ]]; then
   if [[ -n "$PREVIOUS" && -d "$PREVIOUS" ]]; then
     ln -sfn "$PREVIOUS" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"
-    pm2 startOrReload "$BASE/current/deploy/ecosystem.production.config.js" --update-env >/dev/null
+    apply_pm2
   fi
   mkdir -p "$BASE/shared/failed"; touch "$BASE/shared/failed/$TARGET"
   log "FAILED: new version did not answer at $HEALTH_URL; rolled back to $(basename "${PREVIOUS:-none}")"

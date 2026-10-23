@@ -7,7 +7,7 @@
 #
 # Layout under $BASE (default ~/apps/albertdammara.com):
 #   cache/              git clone used to fetch master
-#   releases/<id>/      one build per deployed commit
+#   releases/<id>/      one build per deployed commit (the live one plus the previous)
 #   current -> releases/<id>   what PM2 runs
 #   shared/.env         secrets and DATABASE_URL (shared by every release)
 #   shared/data/        the live SQLite database
@@ -18,7 +18,7 @@
 set -euo pipefail
 
 BASE="${DEPLOY_BASE:-$HOME/apps/albertdammara.com}"
-KEEP_RELEASES=3
+KEEP_RELEASES=2 # the live build plus one to roll back to; each is about 1 GB
 KEEP_BACKUPS=10
 HEALTH_URL="http://127.0.0.1:3000/"
 FORCE="${1:-}"
@@ -74,6 +74,8 @@ cp -p "$DB_FILE" "$BASE/shared/backups/prod-$(date -u +%Y%m%dT%H%M%SZ)-before-$S
 npx prisma db push --skip-generate || fail "database schema update (would it lose data?)"
 
 npm run build || fail "next build"
+# The build cache only speeds up the next build of this same folder, which never happens
+rm -rf "$RELEASE/.next/cache"
 
 PREVIOUS=$(readlink -f "$BASE/current" 2>/dev/null || true)
 ln -sfn "$RELEASE" "$BASE/current.new" && mv -Tf "$BASE/current.new" "$BASE/current"

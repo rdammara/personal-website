@@ -89,7 +89,7 @@ does not answer leaves (or puts back) the previous release.
 ```
 ~/apps/albertdammara.com/
   current -> releases/<time>-<commit>   what PM2 runs (port 3000, localhost only)
-  releases/                             the last 3 builds
+  releases/                             the live build and the one before it
   shared/.env                           secrets; DATABASE_URL points into shared/data
   shared/data/prod.db                   live database
   shared/storage/                       Notion images, uploaded resumes

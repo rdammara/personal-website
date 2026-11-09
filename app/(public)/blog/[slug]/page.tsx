@@ -1,17 +1,28 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getPost, getPublishedPosts, postDate, postSummary, type Post } from '@/lib/posts';
+import { formatDate } from '@/lib/utils';
+import { getPost, getPublishedPosts, postDate, postSummary } from '@/lib/posts';
+import { Markdown } from '@/components/Markdown';
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
 
 // Static export: every post page is built ahead of time; unknown slugs are 404s
 export const dynamicParams = false;
 
+// Static export refuses an empty list, which is what an all-drafts blog gives. The
+// placeholder renders as "not found" and nothing links to it.
+const NO_POSTS = '_no-posts-yet';
+
 export async function generateStaticParams() {
-  return (await getPublishedPosts()).map((post) => ({ slug: post.slug }));
+  const posts = await getPublishedPosts();
+  return posts.length ? posts.map((post) => ({ slug: post.slug })) : [{ slug: NO_POSTS }];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const post: Post | null = await getPost((await params).slug);
+  const post = await getPost((await params).slug);
   return post ? { title: post.title, description: postSummary(post, 155) } : {};
 }
 

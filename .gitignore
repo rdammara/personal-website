@@ -22,3 +22,4 @@ dev.db-journal
 # Cloudflare build output and local wrangler state
 /out
 /.wrangler
+/.dev.vars

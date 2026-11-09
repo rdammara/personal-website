@@ -57,7 +57,9 @@ async function buildPosts() {
   const pages = (
     await collectPaginatedAPI(notion.dataSources.query, {
       data_source_id: NOTION_DATA_SOURCE_ID,
-      filter: { property: 'Status', select: { equals: 'Published' } },
+      // LOCAL_TEST_INCLUDE_DRAFTS=1 builds drafts too, for checking post pages before publishing.
+      // GitHub Actions never sets it.
+      ...(process.env.LOCAL_TEST_INCLUDE_DRAFTS === '1' ? {} : { filter: { property: 'Status', select: { equals: 'Published' } } }),
     })
   ).filter(isFullPage);
 

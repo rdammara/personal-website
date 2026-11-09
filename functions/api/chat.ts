@@ -5,9 +5,17 @@
 
 import { site } from '../../lib/site';
 import { markdownToText } from '../../lib/text';
-import posts from '../../content/generated/posts.json';
-import projects from '../../content/generated/projects.json';
-import resume from '../../content/generated/resume.json';
+import type { Post } from '../../lib/posts';
+import type { Project } from '../../lib/projects';
+import type { Resume } from '../../lib/resume';
+import postsJson from '../../content/generated/posts.json';
+import projectsJson from '../../content/generated/projects.json';
+import resumeJson from '../../content/generated/resume.json';
+
+// Typed explicitly: when a list is empty, TypeScript can't infer its items from the JSON
+const posts = postsJson as Post[];
+const projects = projectsJson as Project[];
+const resume = resumeJson as Resume;
 
 interface Env {
   OPENROUTER_API_KEY?: string;

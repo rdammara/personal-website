@@ -8,9 +8,11 @@
 //   4. The Worker's Settings > Trigger events: add a cron trigger, "0 */3 * * *"
 //      (every 3 hours: about 240 builds a month, inside the free plan's 500)
 
-export default {
+const worker = {
   async scheduled(_controller, env) {
     const res = await fetch(env.DEPLOY_HOOK_URL, { method: 'POST' });
     if (!res.ok) throw new Error(`Deploy hook answered ${res.status}`);
   },
 };
+
+export default worker;

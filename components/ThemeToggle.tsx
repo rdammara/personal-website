@@ -1,15 +1,16 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // false while rendering on the server, true in the browser, without an extra render pass
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   // The theme is unknown on the server, so the switch renders unchecked until mounted.
   const isDark = mounted && resolvedTheme === 'dark';

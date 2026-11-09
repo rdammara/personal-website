@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import { site } from '@/lib/site';
-import { formatDate, timeAgo } from '@/lib/utils';
-import { getProjects, getLastGithubSync, projectDate } from '@/lib/projects';
+import { formatDate, formatDateTime } from '@/lib/utils';
+import { getProjects } from '@/lib/projects';
+import { contentMeta } from '@/lib/content';
 import { PageHeader } from '@/components/PageHeader';
-
-export const revalidate = 0;
 
 export const metadata: Metadata = { title: 'Work' };
 
 export default async function PortfolioPage() {
-  const [projects, githubSync] = await Promise.all([getProjects(), getLastGithubSync()]);
+  const projects = await getProjects();
+  const syncedAt = contentMeta().builtAt;
 
   return (
     <div className="mx-auto max-w-[1180px] px-5 pb-30 sm:px-10 max-sm:pb-18">
@@ -21,9 +21,7 @@ export default async function PortfolioPage() {
           <a href={site.githubUrl} className="font-semibold text-accent hover:underline">
             All repositories on GitHub
           </a>
-          {githubSync?.finishedAt && (
-            <span className="font-mono text-[14px] text-muted">Synced from GitHub {timeAgo(githubSync.finishedAt)}</span>
-          )}
+          <span className="font-mono text-[14px] text-muted">Synced from GitHub {formatDateTime(syncedAt)}</span>
         </p>
       </PageHeader>
 
@@ -39,25 +37,18 @@ export default async function PortfolioPage() {
               <div>
                 <h2 className="m-0 break-words text-[22px] font-bold leading-tight tracking-[-0.01em]">{project.title}</h2>
                 <p className="mb-0 mt-1.5 font-mono text-[13px] text-muted">
-                  {project.githubId ? 'Updated' : 'Added'} {formatDate(projectDate(project))}
+                  Updated {formatDate(project.updatedAt)}
                   {project.language && ` · ${project.language}`}
                 </p>
               </div>
               <p className="m-0 text-muted">{project.description || 'No description yet.'}</p>
               <div className="flex flex-wrap gap-x-5 gap-y-1 md:flex-col md:items-end">
-                {project.externalUrl && (
-                  <a href={project.externalUrl} className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">
-                    {project.externalUrl.startsWith('https://github.com/') ? 'Code on GitHub' : 'Visit'}
-                  </a>
-                )}
+                <a href={project.url} className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">
+                    {project.url.startsWith('https://github.com/') ? 'Code on GitHub' : 'Visit'}
+                </a>
                 {project.homepageUrl && (
                   <a href={project.homepageUrl} className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">
                     Live site
-                  </a>
-                )}
-                {project.downloadUrl && (
-                  <a href={project.downloadUrl} className="inline-flex min-h-11 items-center font-semibold text-accent hover:underline">
-                    Download
                   </a>
                 )}
               </div>

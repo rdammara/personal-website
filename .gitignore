@@ -14,3 +14,12 @@ dev.db-journal
 
 # Images downloaded by the Notion sync
 /storage
+
+# Fetched by scripts/build-content.mjs at build time
+/content/generated
+/public/media
+/public/Albert-Richard-Dammara-Resume.pdf
+# Cloudflare build output and local wrangler state
+/out
+/.wrangler
+/.dev.vars

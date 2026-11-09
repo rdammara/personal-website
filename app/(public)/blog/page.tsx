@@ -4,8 +4,6 @@ import { formatDate } from '@/lib/utils';
 import { getPublishedPosts, postDate, postSummary, postThumbnail } from '@/lib/posts';
 import { PageHeader } from '@/components/PageHeader';
 
-export const revalidate = 0;
-
 export const metadata: Metadata = { title: 'Blog' };
 
 export default async function BlogPage() {

@@ -1,3 +1,24 @@
+## Project notes
+
+Albert Richard Dammara's personal site, albertdammara.com. Read README.md (how it is built and
+hosted) and DESIGN.md (visual direction) before making changes.
+
+- Always write his name in full: Albert Richard Dammara.
+- Commit to the `development` branch only. Albert reviews the preview at
+  development.albertdammara.pages.dev and merges to `master` (production) himself. Merge only
+  when he explicitly says so.
+- Content is not in the repo: blog posts come from his Notion "Blog posts" database (Published
+  only), the resume from the PDF on the Notion "Resume" page, projects from his public GitHub
+  repos tagged `portfolio`. It is fetched at build time by `scripts/build-content.mjs`.
+- Secrets (NOTION_TOKEN, OPENROUTER_API_KEY) live in Cloudflare's settings or a local .env.
+  Never ask him to paste a key into the chat, and never commit one.
+- The ask bar (`functions/api/chat.ts`) uses the OpenRouter model `openrouter/free`; that is his
+  choice, keep it unless he asks.
+- antislop mode for UI and copy work: during.
+- Open items he knows about: the About text says "Software Quality Engineer" but the resume does
+  not list that role; the Work page intro promises a page per project that does not exist yet;
+  the every-3-hours rebuild is not set up.
+
 <!-- antislop:start -->
 ## antislop
 For UI, copy, people, mobile layout, or code comments work, read these installed skill files directly (use these paths even if a same-named global skill exists):

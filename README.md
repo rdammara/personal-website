@@ -25,8 +25,16 @@ gets a preview at development.<project>.pages.dev. The build command is
 3. Cloudflare compiles `functions/api/chat.ts`, the ask bar's backend, which answers from the
    same content with an OpenRouter model and falls back to keyword search.
 
-A scheduled Worker (`cron/rebuild-worker.js`) calls the project's deploy hook every 3 hours, so
-new posts, projects and resume changes appear without a code change.
+New posts, projects and resume changes appear at the next build: after a merge to `master`, or
+by hand in Cloudflare (albertdammara → Deployments → ⋯ on the latest production deploy → Retry
+deployment). `cron/rebuild-worker.js` is a ready-made scheduled Worker that would rebuild every 3
+hours through a deploy hook; it is not set up yet, and its comments explain how.
+
+## Workflow
+
+Code changes are committed to `development`. Albert checks the preview at
+development.albertdammara.pages.dev and merges to `master` himself. The Cloudflare free plan
+allows about 500 builds a month.
 
 ### Cloudflare settings
 

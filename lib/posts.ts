@@ -1,29 +1,33 @@
-import { prisma } from './prisma';
+import { readContent } from './content';
 import { excerpt } from './utils';
-import { markdownToText } from '@/components/Markdown';
+import { markdownToText } from './text';
 
-type PostLike = { content: string; summary: string | null; publishedAt: Date | null; createdAt: Date };
+export type Post = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  content: string; // Markdown
+  publishedAt: string;
+  editedAt: string;
+};
 
-// The date a post shows: Notion's publish date, or when it was created here
-export const postDate = (post: PostLike) => post.publishedAt ?? post.createdAt;
-
-export const postSummary = (post: PostLike, maxLength: number) =>
-  post.summary ?? excerpt(markdownToText(post.content), maxLength);
-
+// Newest first, as saved by the build
 export async function getPublishedPosts(take?: number) {
-  return prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-    take,
-  });
+  const posts = readContent<Post[]>('posts.json');
+  return take ? posts.slice(0, take) : posts;
 }
 
-export async function getLastNotionSync() {
-  return prisma.syncRun.findFirst({ where: { source: 'notion', ok: true }, orderBy: { startedAt: 'desc' } });
+export async function getPost(slug: string) {
+  return readContent<Post[]>('posts.json').find((p) => p.slug === slug) ?? null;
 }
+
+export const postDate = (post: Post) => post.publishedAt;
+
+export const postSummary = (post: Post, maxLength: number) => post.summary ?? excerpt(markdownToText(post.content), maxLength);
 
 // The first photo in a post, used as its thumbnail in post lists (null when it has none).
-// Only images the sync stored locally or https images count.
+// Only photos saved with the site or https images count.
 export function postThumbnail(post: { content: string }) {
   const match = post.content.match(/!\[[^\]]*\]\(((?:\/media\/|https:\/\/)[^)\s]+)\)/);
   return match ? match[1] : null;

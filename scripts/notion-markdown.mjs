@@ -1,12 +1,13 @@
 // Converts Notion blocks to Markdown and downloads Notion-hosted images.
-// Kept apart from sync-notion.mjs so it can be imported without starting a sync.
+// Used by build-content.mjs.
 
 import { collectPaginatedAPI, isFullBlock } from '@notionhq/client';
 import { createHash } from 'node:crypto';
 import { writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
 
-export const MEDIA_DIR = path.join(process.cwd(), 'storage', 'notion-media');
+// Photos are saved with the static site and served as /media/<file>
+export const MEDIA_DIR = path.join(process.cwd(), 'public', 'media');
 // No SVG: it can carry scripts, and these files are served from the site's own origin
 const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' };
 

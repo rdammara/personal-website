@@ -1,14 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { site } from '@/lib/site';
-import { formatDate, timeAgo, excerpt } from '@/lib/utils';
-import { getPublishedPosts, getLastNotionSync, postDate, postSummary, postThumbnail } from '@/lib/posts';
-import { getCurrentResume } from '@/lib/resume-file';
-import { getProjects, getLastGithubSync, projectDate } from '@/lib/projects';
+import { formatDate, formatDateTime, excerpt } from '@/lib/utils';
+import { getPublishedPosts, postDate, postSummary, postThumbnail } from '@/lib/posts';
+import { getCurrentResume } from '@/lib/resume';
+import { getProjects } from '@/lib/projects';
+import { contentMeta } from '@/lib/content';
 import { AskBar } from '@/components/AskBar';
 import { PipelineDiagram } from '@/components/PipelineDiagram';
-
-export const revalidate = 0;
 
 const container = 'mx-auto max-w-[1180px] px-5 sm:px-10';
 const h2 = 'm-0 text-[clamp(32px,4.4vw,56px)] font-bold leading-[1.05] tracking-[-0.03em]';
@@ -18,14 +17,9 @@ function isGitHub(url: string) {
 }
 
 export default async function HomePage() {
-  const [posts, projects, lastSync, resume, githubSync] = await Promise.all([
-    getPublishedPosts(3),
-    getProjects(4),
-    getLastNotionSync(),
-    getCurrentResume(),
-    getLastGithubSync(),
-  ]);
-  const syncedAt = lastSync?.finishedAt ?? null;
+  const [posts, projects, resume] = await Promise.all([getPublishedPosts(3), getProjects(4), getCurrentResume()]);
+  // Every build reads Notion, GitHub and the resume afresh, so this is when they were synced
+  const syncedAt = contentMeta().builtAt;
   const [featured, ...moreProjects] = projects;
 
   return (
@@ -77,17 +71,15 @@ export default async function HomePage() {
             <div className="grid gap-12 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
               <div>
                 <p className="font-mono text-[13px] text-bandmuted">
-                  Updated {formatDate(projectDate(featured))}
+                  Updated {formatDate(featured.updatedAt)}
                   {featured.language && ` · ${featured.language}`}
                 </p>
                 <h3 className="mt-2 text-[30px] font-bold leading-tight tracking-[-0.02em]">{featured.title}</h3>
                 <p className="mt-4 text-bandmuted">{featured.description || 'No description yet.'}</p>
                 <p className="mt-7 flex flex-wrap gap-x-6 gap-y-2 font-semibold">
-                  {featured.externalUrl && (
-                    <a href={featured.externalUrl} className="text-bandaccent hover:underline">
-                      {isGitHub(featured.externalUrl) ? 'View the code on GitHub' : 'Visit the project'}
-                    </a>
-                  )}
+                  <a href={featured.url} className="text-bandaccent hover:underline">
+                    {isGitHub(featured.url) ? 'View the code on GitHub' : 'Visit the project'}
+                  </a>
                   {featured.homepageUrl && (
                     <a href={featured.homepageUrl} className="text-bandaccent hover:underline">
                       Visit the live site
@@ -100,13 +92,9 @@ export default async function HomePage() {
                   {moreProjects.map((p) => (
                     <li key={p.id} className="border-t border-bandline py-5">
                       <p className="font-semibold">
-                        {p.externalUrl ? (
-                          <a href={p.externalUrl} className="text-onband no-underline hover:text-bandaccent">
-                            {p.title}
-                          </a>
-                        ) : (
-                          p.title
-                        )}
+                        <a href={p.url} className="text-onband no-underline hover:text-bandaccent">
+                          {p.title}
+                        </a>
                       </p>
                       {p.language && <p className="mt-0.5 font-mono text-[13px] text-bandmuted">{p.language}</p>}
                       <p className="mt-1 text-[15px] text-bandmuted">{excerpt(p.description || 'No description yet.', 110)}</p>
@@ -124,9 +112,7 @@ export default async function HomePage() {
               All work
             </Link>
             <span className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-              {githubSync?.finishedAt && (
-                <span className="font-mono text-[14px] text-bandmuted">Synced from GitHub {timeAgo(githubSync.finishedAt)}</span>
-              )}
+              <span className="font-mono text-[14px] text-bandmuted">Synced from GitHub {formatDateTime(syncedAt)}</span>
               <a href={site.githubUrl} className="text-bandmuted hover:text-bandaccent">
                 All repositories on GitHub
               </a>
@@ -140,7 +126,7 @@ export default async function HomePage() {
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
             <h2 className={h2}>Blog</h2>
             <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
-              {syncedAt && <span className="font-mono text-[14px] text-muted">Synced from Notion {timeAgo(syncedAt)}</span>}
+              <span className="font-mono text-[14px] text-muted">Synced from Notion {formatDateTime(syncedAt)}</span>
               <Link href="/blog" className="font-semibold text-accent hover:underline">
                 All posts
               </Link>
@@ -184,10 +170,11 @@ export default async function HomePage() {
         <div className={container}>
           <h2 className={h2}>How this site works</h2>
           <p className="mb-12 mt-4 max-w-[36em] text-[19px] text-muted">
-            It runs on a small pipeline. {syncedAt ? 'I write posts in Notion, and a sync job copies them into the database every 15 minutes.' : 'I’m connecting a sync from Notion, so posts I write there publish here.'}{' '}
-            The pages are built from that database, and the ask bar at the top searches the same data.
+            It runs on a small pipeline. I write posts in Notion and keep projects on GitHub. Every hour a build reads
+            both, plus my resume, and turns them into the pages you are reading. The ask bar at the top answers from the
+            same content.
           </p>
-          <PipelineDiagram notionLive={Boolean(syncedAt)} />
+          <PipelineDiagram />
         </div>
       </section>
 
@@ -199,7 +186,8 @@ export default async function HomePage() {
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
               {resume && (
                 <a
-                  href="/download/resume"
+                  href={resume.file}
+                  download
                   className="inline-flex min-h-12 items-center rounded-full bg-fill px-6 font-semibold text-onfill no-underline"
                 >
                   Download resume (PDF)

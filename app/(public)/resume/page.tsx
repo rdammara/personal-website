@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { getCurrentResume } from '@/lib/resume-file';
+import { getCurrentResume } from '@/lib/resume';
 import { formatDate } from '@/lib/utils';
 import { PageHeader } from '@/components/PageHeader';
-
-export const revalidate = 0;
 
 export const metadata: Metadata = { title: 'Resume' };
 
@@ -23,18 +21,19 @@ export default async function ResumePage() {
       <PageHeader title="Resume">
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
           <a
-            href="/download/resume"
+            href={resume.file}
+            download
             className="inline-flex min-h-12 items-center rounded-full bg-fill px-6 font-semibold text-onfill no-underline"
           >
             Download resume (PDF)
           </a>
-          <span className="font-mono text-[13px] text-muted">Updated {formatDate(resume.uploadedAt)}</span>
+          <span className="font-mono text-[13px] text-muted">Updated {formatDate(resume.updatedAt)}</span>
         </div>
       </PageHeader>
 
       {/* Phone browsers often can't show a PDF inside a page, so the embed is for wider screens */}
       <iframe
-        src="/download/resume?inline=1"
+        src={resume.file}
         title="Resume PDF"
         className="hidden h-[min(1150px,85vh)] w-full rounded-xl border border-line bg-surface md:block"
       />

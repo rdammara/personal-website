@@ -3,19 +3,19 @@
 type Stage = { title: string; detail: string; planned?: boolean; highlight?: boolean };
 type StageKey = 'notion' | 'sync' | 'db' | 'site' | 'resume' | 'ask';
 
-const getStages = (notionLive: boolean): Record<StageKey, Stage> => ({
-  notion: { title: 'Notion', detail: 'Where I write posts', planned: !notionLive },
-  sync: { title: 'Sync job', detail: 'Every 15 minutes', planned: !notionLive },
-  db: { title: 'Database', detail: 'Posts and projects' },
-  site: { title: 'This website', detail: 'Pages built from the data' },
-  resume: { title: 'Resume', detail: 'Roles, skills, education' },
+const getStages = (): Record<StageKey, Stage> => ({
+  notion: { title: 'Notion', detail: 'Where I write posts' },
+  sync: { title: 'Hourly build', detail: 'GitHub Actions' },
+  db: { title: 'Content files', detail: 'Posts, projects, resume' },
+  site: { title: 'This website', detail: 'Static pages, Cloudflare' },
+  resume: { title: 'Resume', detail: 'PDF on a Notion page' },
   ask: { title: 'Ask bar', detail: 'Answers from these only', highlight: true },
 });
 
 function describe(stages: Record<StageKey, Stage>) {
   const planned = (Object.values(stages) as Stage[]).filter((s) => s.planned).map((s) => s.title);
   return (
-    'Notion feeds a sync job, which loads the database. The database feeds this website and the ask bar. The resume also feeds the ask bar.' +
+    'Notion feeds an hourly build, which saves the content files. They feed this website and the ask bar. The resume also feeds the ask bar.' +
     (planned.length ? ` Planned, not live yet: ${planned.join(', ')}.` : '')
   );
 }
@@ -92,8 +92,8 @@ function Down() {
   );
 }
 
-export function PipelineDiagram({ notionLive = false }: { notionLive?: boolean }) {
-  const stages = getStages(notionLive);
+export function PipelineDiagram() {
+  const stages = getStages();
   const description = describe(stages);
   return (
     <figure className="m-0">
